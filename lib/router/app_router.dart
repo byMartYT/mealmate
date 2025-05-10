@@ -11,7 +11,7 @@ final _shellKey = GlobalKey<NavigatorState>();
 
 class Routes {
   static const String home = '/home';
-  static const String searchPath = '/discover';
+  static const String searchPath = '/search';
   static const String cameraPath = '/camera';
   static const String favoritesPath = '/favorites';
   static const String listPath = '/list';

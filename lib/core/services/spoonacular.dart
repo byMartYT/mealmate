@@ -17,7 +17,7 @@ class SpoonacularRepository {
     int limit = 20,
     String type = '',
     String diet = '',
-    String sort = 'popularity',
+    String sort = '',
   }) async {
     final res = await _dio.get(
       '/recipes/complexSearch',

@@ -25,7 +25,13 @@ class HomeController extends StateNotifier<HomeState> {
       random: state.random,
       isLoading: true,
     );
-    final popular = await _repo.search('', 0, type: 'main course', limit: 10);
+    final popular = await _repo.search(
+      '',
+      0,
+      type: 'main course',
+      limit: 10,
+      sort: 'popularity',
+    );
     final random = await _repo.search(
       '',
       0,

@@ -18,7 +18,7 @@ class _CameraPageState extends State<CameraPage> {
   Future<void> _pick() async {
     final picker = ImagePicker();
     final img = await picker.pickImage(source: ImageSource.camera);
-    if (img == null && mounted) Navigator.pop(context); // aborted
+    // if (img == null && mounted) Navigator.pop(context); // aborted
     // Otherwise → push to detail / upload, then:
     // if (mounted) Navigator.pop(context);
   }
