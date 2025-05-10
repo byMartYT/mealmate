@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mealmate_new/features/favorites/favorites_page.dart';
+import 'package:mealmate_new/features/general/recipe_detail_page.dart';
 import 'package:mealmate_new/features/shopping_list/shopping_page.dart';
 import '../features/home/home_page.dart';
 import '../features/search/search_page.dart';
@@ -9,73 +9,112 @@ import '../features/camera/camera_page.dart';
 
 final _shellKey = GlobalKey<NavigatorState>();
 
-final routerProvider = Provider<GoRouter>((ref) {
-  return GoRouter(
-    initialLocation: '/',
-    routes: [
-      ShellRoute(
-        navigatorKey: _shellKey,
-        builder: (context, state, child) => TabScaffold(child: child),
-        routes: [
-          GoRoute(
-            path: '/',
-            name: 'home',
-            builder: (_, __) => const HomePage(),
-          ),
-          GoRoute(
-            path: '/search',
-            name: 'search',
-            builder: (_, __) => const SearchPage(),
-          ),
-          GoRoute(
-            path: '/camera',
-            name: 'camera',
-            pageBuilder: (_, __) => const NoTransitionPage(child: CameraPage()),
-          ),
-          GoRoute(
-            path: '/favorites',
-            name: 'favorites',
-            builder: (_, __) => const FavoritesPage(),
-          ),
-          GoRoute(
-            path: '/shopping',
-            name: 'shopping',
-            builder: (_, __) => const ShoppingPage(),
-          ),
-        ],
-      ),
-    ],
-  );
-});
+class Routes {
+  static const String home = '/home';
+  static const String searchPath = '/discover';
+  static const String cameraPath = '/camera';
+  static const String favoritesPath = '/favorites';
+  static const String listPath = '/list';
+}
+
+final router = GoRouter(
+  navigatorKey: _shellKey,
+  initialLocation: '/home',
+  routes: [
+    StatefulShellRoute.indexedStack(
+      builder:
+          (context, state, navigationShell) =>
+              TabScaffold(child: navigationShell),
+      branches: [
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: Routes.home,
+              builder: (context, state) => HomePage(),
+              routes: [
+                GoRoute(
+                  path: 'detail',
+                  builder:
+                      (context, state) =>
+                          RecipeDetailPage(id: state.extra as int),
+                ),
+              ],
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: Routes.searchPath,
+              builder: (context, state) => SearchPage(),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: Routes.cameraPath,
+              builder: (context, state) => CameraPage(),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: Routes.favoritesPath,
+              builder: (context, state) => FavoritesPage(),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: Routes.listPath,
+              builder: (context, state) => ShoppingPage(),
+            ),
+          ],
+        ),
+      ],
+    ),
+  ],
+);
 
 /// BottomNavigation wrapper
-class TabScaffold extends ConsumerWidget {
+class TabScaffold extends StatelessWidget {
   const TabScaffold({required this.child, super.key});
-  final Widget child;
+
+  final StatefulNavigationShell child;
 
   static const _tabs = [
-    ('/', Icons.home, 'Home'),
-    ('/search', Icons.search, 'Search'),
-    ('/camera', Icons.camera, 'Scan'),
-    ('/favorites', Icons.star, 'Favs'),
-    ('/shopping', Icons.shopping_cart, 'List'),
+    (Routes.home, Icons.home, 'Home'),
+    (Routes.searchPath, Icons.search, 'Search'),
+    (Routes.cameraPath, Icons.camera_alt, 'Scan'),
+    (Routes.favoritesPath, Icons.star, 'Favs'),
+    (Routes.listPath, Icons.shopping_cart, 'List'),
   ];
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final goRouter = GoRouter.of(context);
-    final location =
-        goRouter.routerDelegate.currentConfiguration.uri.toString();
+  Widget build(BuildContext context) {
+    // final idx = _tabs.indexWhere((t) => .startsWith(t.$1));
+    // final selectedIndex = idx < 0 ? 0 : idx;
 
     return Scaffold(
       body: child,
       bottomNavigationBar: NavigationBar(
-        selectedIndex: _tabs.indexWhere((t) => location.startsWith(t.$1)),
-        onDestinationSelected: (i) => goRouter.go(_tabs[i].$1),
+        selectedIndex: child.currentIndex,
+        onDestinationSelected: (i) {
+          // Double-tap on the same tab resets to branch root
+          if (i == child.currentIndex) {
+            child.goBranch(i, initialLocation: true);
+          } else {
+            child.goBranch(i);
+          }
+        },
         destinations:
             _tabs
                 .map(
-                  (t) => NavigationDestination(icon: Icon(t.$2), label: t.$3),
+                  (tab) =>
+                      NavigationDestination(icon: Icon(tab.$2), label: tab.$3),
                 )
                 .toList(),
       ),

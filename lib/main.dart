@@ -5,6 +5,8 @@ import 'package:mealmate_new/router/app_router.dart';
 import 'package:mealmate_new/theme/theme_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+const kSpacing = 12.0;
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: '.env'); // loads .env
@@ -24,7 +26,6 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeModeProvider);
-    final router = ref.watch(routerProvider);
 
     return MaterialApp.router(
       title: 'MealMate',

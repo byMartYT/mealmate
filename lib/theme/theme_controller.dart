@@ -30,13 +30,13 @@ final themeModeProvider = StateNotifierProvider<ThemeModeNotifier, ThemeMode>(
 );
 
 final lightTheme = ThemeData(
-  colorScheme: ColorScheme.fromSeed(seedColor: Colors.orange),
+  colorScheme: ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 32, 172, 0)),
 );
 
 final darkTheme = ThemeData(
   brightness: Brightness.dark,
   colorScheme: ColorScheme.fromSeed(
-    seedColor: Colors.orange,
+    seedColor: Color.fromARGB(255, 32, 172, 0),
     brightness: Brightness.dark,
   ),
 );

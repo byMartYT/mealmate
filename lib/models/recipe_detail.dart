@@ -7,6 +7,7 @@ class RecipeDetail {
     required this.servings,
     required this.readyInMinutes,
     required this.summaryHtml,
+    required this.imageType,
     required this.extendedIngredients,
     this.sourceName,
     this.sourceUrl,
@@ -16,7 +17,9 @@ class RecipeDetail {
   final String title;
   final String image;
   final int servings;
+  final String imageType;
   final int readyInMinutes;
+
   final String summaryHtml; // contains <b> tags
   final List<Ingredient> extendedIngredients;
 
@@ -29,6 +32,7 @@ class RecipeDetail {
     title: j['title'] as String,
     image: j['image'] as String,
     servings: j['servings'] as int,
+    imageType: j['imageType'] ?? 'jpg',
     readyInMinutes: j['readyInMinutes'] as int,
     summaryHtml: j['summary'] as String,
     sourceName: j['sourceName'] as String?,
@@ -38,6 +42,12 @@ class RecipeDetail {
             .map((e) => Ingredient.fromJson(e as Map<String, dynamic>))
             .toList(),
   );
+
+  String get imageUrlLarge =>
+      'https://img.spoonacular.com/recipes/$id-636x393.$imageType';
+
+  String get imageUrlMedium =>
+      'https://img.spoonacular.com/recipes/$id-480x360.$imageType';
 
   Map<String, dynamic> toJson() => {
     'id': id,
@@ -58,21 +68,18 @@ class Ingredient {
     required this.name,
     required this.amount,
     required this.unit,
-    required this.image,
   });
 
   final int id;
   final String name;
   final double amount;
   final String unit;
-  final String image;
 
   factory Ingredient.fromJson(Map<String, dynamic> j) => Ingredient(
     id: j['id'] as int,
     name: j['name'] as String,
     amount: (j['amount'] as num).toDouble(),
     unit: j['unit'] as String,
-    image: j['image'] as String,
   );
 
   Map<String, dynamic> toJson() => {
@@ -80,6 +87,5 @@ class Ingredient {
     'name': name,
     'amount': amount,
     'unit': unit,
-    'image': image,
   };
 }

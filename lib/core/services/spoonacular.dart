@@ -15,6 +15,9 @@ class SpoonacularRepository {
     String q,
     int offset, {
     int limit = 20,
+    String type = '',
+    String diet = '',
+    String sort = 'popularity',
   }) async {
     final res = await _dio.get(
       '/recipes/complexSearch',
@@ -23,10 +26,35 @@ class SpoonacularRepository {
         'number': limit,
         'offset': offset,
         'apiKey': _key,
+        'addRecipeInformation': true,
+        'type': type,
+        'diet': diet,
+        'sort': sort,
+        'sortDirection': 'desc',
       },
     );
     return (res.data['results'] as List)
         .map((j) => RecipeSummary.fromJson(j))
+        .toList();
+  }
+
+  Future<RecipeDetail> get(int id) async {
+    final res = await _dio.get(
+      '/recipes/$id/information',
+      queryParameters: {'apiKey': _key, 'includeNutrition': false},
+    );
+    return RecipeDetail.fromJson(res.data);
+  }
+
+  Future<List<RecipeDetail>> random(int number) async {
+    if (number <= 0) return Future.value([]);
+    final res = await _dio.get(
+      '/recipes/random',
+      queryParameters: {'number': number, 'apiKey': _key},
+    );
+    print(res.data);
+    return (res.data['recipes'] as List)
+        .map((j) => RecipeDetail.fromJson(j))
         .toList();
   }
 
