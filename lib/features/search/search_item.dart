@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mealmate_new/main.dart';
 import 'package:mealmate_new/models/recipe_summary.dart';
 
 class SearchItem extends StatelessWidget {
@@ -18,33 +17,43 @@ class SearchItem extends StatelessWidget {
           ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: kSpacing,
         children: [
-          Expanded(
+          // Quadratisches Bild mit AspectRatio
+          AspectRatio(
+            aspectRatio: 1.0, // Quadratisches Verhältnis
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8),
-              child: Image.network(
-                height: 180,
-                width: double.infinity,
-                recipe.image,
-                fit: BoxFit.cover,
+              child: Image.network(recipe.image, fit: BoxFit.cover),
+            ),
+          ),
+          SizedBox(height: 8), // Konsistenter Abstand
+          // Titel mit fester Höhe für 2 Zeilen
+          SizedBox(
+            height: 38, // Leicht reduzierte Höhe für 2 Zeilen Text
+            child: Text(
+              recipe.title,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                fontWeight: FontWeight.bold,
+                fontSize: 14, // Etwas kleinere Schrift
+                height: 1.2, // Kompaktere Zeilenhöhe
               ),
             ),
           ),
-          Text(
-            recipe.title,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-              fontWeight: FontWeight.bold,
-              fontSize: 15,
+          // Kochzeit mit minimalem Abstand
+          Padding(
+            padding: const EdgeInsets.only(top: 2), // Reduzierten Abstand
+            child: Text(
+              recipe.cookingTime ?? '',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 11, // Etwas kleinere Schrift
+                color: Color.fromARGB(153, 0, 0, 0),
+                height: 1.0, // Minimale Zeilenhöhe
+              ),
             ),
-          ),
-          Text(
-            recipe.cookingTime!,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(fontSize: 12, color: Color.fromARGB(153, 0, 0, 0)),
           ),
         ],
       ),

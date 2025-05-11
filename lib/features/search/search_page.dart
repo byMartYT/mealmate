@@ -224,7 +224,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                 padding: kPadding,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
-                  childAspectRatio: 0.75,
+                  childAspectRatio: 0.74,
                   mainAxisSpacing: 16,
                   crossAxisSpacing: 16,
                 ),

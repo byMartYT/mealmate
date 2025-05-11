@@ -1,28 +1,28 @@
+import 'package:mealmate_new/models/ingredient.dart';
+
 class RecipeSummary {
   final String id;
   final String title;
-  final String imageType;
-  final String? cookingTime;
-  final String? servings;
-  final bool vegetarian;
-  final bool vegan;
-  final String? area;
-  final String? category;
+  final String cookingTime;
+  final String servings;
+  final String? cuisine;
+  final String category;
   final String image;
   final List<String>? tags;
+  final List<String> instructions;
+  final List<Ingredient> ingredients;
 
   RecipeSummary({
     required this.id,
     required this.title,
-    this.imageType = 'jpg',
-    this.cookingTime,
-    this.servings,
-    this.vegetarian = false,
-    this.vegan = false,
-    this.area,
-    this.category,
+    required this.cookingTime,
+    required this.servings,
+    this.cuisine,
+    required this.category,
     required this.image,
+    required this.instructions,
     this.tags,
+    required this.ingredients,
   });
 
   factory RecipeSummary.fromJson(Map<String, dynamic> json) {
@@ -32,12 +32,17 @@ class RecipeSummary {
     return RecipeSummary(
       id: id.toString(),
       title: json['title'],
-      imageType: json['imageType'] ?? 'jpg',
+      ingredients:
+          (json['ingredients'] as List<dynamic>)
+              .map((ingredient) => Ingredient.fromJson(ingredient))
+              .toList(),
       cookingTime: json['cookingTime'],
       servings: json['servings'],
-      vegetarian: json['vegetarian'] ?? false,
-      vegan: json['vegan'] ?? false,
-      area: json['area'],
+      instructions:
+          json['instructions'] != null
+              ? List<String>.from(json['instructions'])
+              : [],
+      cuisine: json['cuisine'],
       category: json['category'],
       image: json['image'],
       tags: json['tags'] != null ? List<String>.from(json['tags']) : null,
@@ -51,12 +56,10 @@ class RecipeSummary {
     return {
       'id': id,
       'title': title,
-      'imageType': imageType,
       'cookingTime': cookingTime,
       'servings': servings,
-      'vegetarian': vegetarian,
-      'vegan': vegan,
-      'area': area,
+      'cuisine': cuisine,
+      'ingredients': ingredients.map((i) => i.toJson()).toList(),
       'category': category,
       'image': image,
       'tags': tags,
