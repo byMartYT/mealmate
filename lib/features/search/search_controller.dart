@@ -36,7 +36,7 @@ class SearchController extends StateNotifier<SearchState> {
   String? _area;
 
   SearchController(this._repo, this._query) : super(const SearchState()) {
-    _fetch();
+    // Kein automatischer Fetch im Konstruktor, wir rufen fetchNext() oder changeFilter() explizit auf
   }
 
   Future<void> fetchNext() async {

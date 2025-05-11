@@ -1,11 +1,23 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mealmate_new/core/services/backend_service.dart';
 import 'package:mealmate_new/features/search/search_item.dart';
 import 'package:mealmate_new/main.dart';
 import 'search_controller.dart';
 
-enum FilterOption { none /*, vegetarian, glutenFree, ...*/ }
+// Provider für die zwischengespeicherten Kategorien
+final categoriesProvider = StateProvider<List<String>>((ref) => []);
+
+// Provider für das Laden der Kategorien
+final categoriesFutureProvider = FutureProvider<List<String>>((ref) async {
+  // Lade die Kategorien vom Backend
+  final repo = ref.watch(backendRepoProvider);
+  final categories = await repo.getCategories();
+  // Aktualisiere den State-Provider
+  ref.read(categoriesProvider.notifier).state = categories;
+  return categories;
+});
 
 class SearchPage extends ConsumerStatefulWidget {
   const SearchPage({super.key});
@@ -18,14 +30,23 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   final _scrollController = ScrollController();
   final _searchController = TextEditingController();
   String _query = '';
-  FilterOption _filter = FilterOption.none;
+  String? _selectedCategory;
 
   @override
   void initState() {
     super.initState();
     // Trigger initial empty-query fetch
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(searchControllerProvider(_query).notifier).fetchNext();
+      // Lade die Kategorien beim initialen Laden der Seite
+      ref.read(categoriesFutureProvider);
+
+      // Initialisiere den Controller und wende ggf. Kategoriefilter an
+      final controller = ref.read(searchControllerProvider(_query).notifier);
+      if (_selectedCategory != null) {
+        controller.changeFilter(category: _selectedCategory);
+      } else {
+        controller.fetchNext();
+      }
     });
     _scrollController.addListener(_onScroll);
   }
@@ -46,24 +67,84 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   }
 
   Future<void> _showFilterDialog() async {
-    final choice = await showModalBottomSheet<FilterOption>(
+    // Verwende die zwischengespeicherten Kategorien oder lade sie, wenn sie noch nicht geladen wurden
+    List<String> categories = ref.read(categoriesProvider);
+
+    // Wenn die Kategorien noch nicht geladen wurden, lade sie jetzt
+    if (categories.isEmpty) {
+      try {
+        // Zeige einen Ladeindikator nur wenn wir explizit Kategorien laden müssen
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (_) => const Center(child: CircularProgressIndicator()),
+        );
+
+        // Lade die Kategorien vom Backend
+        categories = await ref.read(backendRepoProvider).getCategories();
+        ref.read(categoriesProvider.notifier).state = categories;
+
+        // Schließe den Ladeindikator
+        if (context.mounted) Navigator.of(context).pop();
+      } catch (e) {
+        // Bei einem Fehler den Ladeindikator entfernen
+        if (context.mounted) Navigator.of(context).pop();
+        return; // Beende die Methode, da wir keine Kategorien haben
+      }
+    }
+
+    // Jetzt haben wir garantiert Kategorien (oder die Methode wurde bereits beendet)
+    if (!context.mounted) return;
+
+    final category = await showModalBottomSheet<String>(
       context: context,
-      builder: (_) {
-        return ListView(
-          children:
-              FilterOption.values.map((opt) {
-                return RadioListTile<FilterOption>(
-                  title: Text(opt.name),
-                  value: opt,
-                  groupValue: _filter,
-                  onChanged: (v) => Navigator.pop(context, v),
-                );
-              }).toList(),
+      builder: (context) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: Text(
+                'Alle Kategorien',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              onTap: () => Navigator.pop(context, null),
+              trailing:
+                  _selectedCategory == null
+                      ? Icon(Icons.check, color: Theme.of(context).primaryColor)
+                      : null,
+            ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: categories.length,
+                itemBuilder: (context, index) {
+                  final category = categories[index];
+                  return ListTile(
+                    title: Text(category),
+                    onTap: () => Navigator.pop(context, category),
+                    trailing:
+                        _selectedCategory == category
+                            ? Icon(
+                              Icons.check,
+                              color: Theme.of(context).primaryColor,
+                            )
+                            : null,
+                  );
+                },
+              ),
+            ),
+          ],
         );
       },
     );
-    if (choice != null && choice != _filter) {
-      setState(() => _filter = choice);
+
+    if (category != _selectedCategory) {
+      setState(() {
+        _selectedCategory = category;
+      });
+
+      // Aktualisiere Filter und lade neue Rezepte (ohne Controller-Invalidierung)
+      final controller = ref.read(searchControllerProvider(_query).notifier);
+      controller.changeFilter(category: category);
     }
   }
 
@@ -71,7 +152,6 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   Widget build(BuildContext context) {
     final state = ref.watch(searchControllerProvider(_query));
     final recipes = state.items;
-    print(state.isLoading);
 
     return Scaffold(
       appBar: AppBar(
@@ -81,18 +161,49 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             controller: _searchController,
             textInputAction: TextInputAction.search,
             autofocus: true,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               hintText: 'Search recipes...',
               border: InputBorder.none,
-              contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+              contentPadding: const EdgeInsets.symmetric(
+                vertical: 8,
+                horizontal: 16,
+              ),
+              suffix:
+                  _selectedCategory != null
+                      ? Chip(
+                        label: Text(
+                          _selectedCategory!,
+                          style: const TextStyle(fontSize: 10),
+                        ),
+                        onDeleted: () {
+                          setState(() => _selectedCategory = null);
+                          // Explizit den Controller mit null-Kategorie aktualisieren
+                          final controller = ref.read(
+                            searchControllerProvider(_query).notifier,
+                          );
+                          controller.changeFilter(category: null);
+                        },
+                        visualDensity: VisualDensity.compact,
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      )
+                      : null,
             ),
             onSubmitted: (value) {
+              // Speichere den aktuellen Filter
+              final currentCategory = _selectedCategory;
+
               setState(() {
                 _query = value;
               });
-              // Reset and fetch new query
-              ref.refresh(searchControllerProvider(value));
-              ref.read(searchControllerProvider(value).notifier).fetchNext();
+
+              // Controller aktualisieren ohne automatischen Fetch
+              ref.invalidate(searchControllerProvider(value));
+
+              // Explizit nur einen Fetch mit korrektem Filter ausführen
+              final controller = ref.read(
+                searchControllerProvider(value).notifier,
+              );
+              controller.changeFilter(category: currentCategory);
             },
           ),
         ),
@@ -107,6 +218,8 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       body:
           state.isLoading && recipes.isEmpty
               ? const Center(child: CircularProgressIndicator())
+              : recipes.isEmpty
+              ? Center(child: Text('Keine Rezepte gefunden'))
               : GridView.builder(
                 padding: kPadding,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(

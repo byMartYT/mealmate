@@ -62,18 +62,35 @@ async def get_recipes(
     query = {}
     pipeline = []
     
+    # Kategorie- und Bereichsfilter anwenden (unabhängig vom Suchbegriff)
+    if category:
+        query["category"] = {"$regex": category, "$options": "i"}
+    
+    if area:
+        query["area"] = {"$regex": area, "$options": "i"}
+    
     if search:
         # Wenn ein Suchbegriff vorhanden ist, berechnen wir eine Relevanz
         search_regex = {"$regex": search, "$options": "i"}
         
         # Grundlegende Suche über mehrere Felder
-        query["$or"] = [
-            {"title": search_regex},
-            {"tags": search_regex},
-            {"category": search_regex},
-            {"area": search_regex},
-            {"ingredients.name": search_regex}
-        ]
+        search_query = {
+            "$or": [
+                {"title": search_regex},
+                {"tags": search_regex},
+                {"category": search_regex},
+                {"area": search_regex},
+                {"ingredients.name": search_regex}
+            ]
+        }
+        
+        # Kombiniere Suchfilter mit Kategorie/Bereichsfilter
+        if query:
+            # Wenn bereits Filter existieren, wende sie zusammen mit der Suche an
+            query = {"$and": [query, search_query]}
+        else:
+            # Wenn keine Filter existieren, verwende nur die Suche
+            query = search_query
         
         # Wenn keine Sortierung angegeben wurde, nach Relevanz sortieren
         if not sort_by:
@@ -91,7 +108,13 @@ async def get_recipes(
                             # Treffer in Herkunftsregion
                             {"$cond": [{"$regexMatch": {"input": {"$ifNull": ["$area", ""]}, "regex": search, "options": "i"}}, 7, 0]},
                             # Treffer in Tags
-                            {"$cond": [{"$in": [search, {"$ifNull": ["$tags", []]}]}, 5, 0]},
+                            {"$cond": [{"$anyElementTrue": {
+                                "$map": {
+                                    "input": {"$ifNull": ["$tags", []]},
+                                    "as": "tag",
+                                    "in": {"$regexMatch": {"input": "$$tag", "regex": search, "options": "i"}}
+                                }
+                            }}, 5, 0]},
                             # Zählen wie viele Zutaten übereinstimmen (weniger wichtig)
                             {"$size": {"$filter": {
                                 "input": {"$ifNull": ["$ingredients", []]},
@@ -121,12 +144,7 @@ async def get_recipes(
             
             recipes = await cursor.skip(skip).limit(limit).to_list(limit)
     else:
-        # Wenn kein Suchbegriff vorhanden ist, filtern wir nur nach Kategorie/Bereich
-        if category:
-            query["category"] = {"$regex": category, "$options": "i"}
-        
-        if area:
-            query["area"] = {"$regex": area, "$options": "i"}
+        # Wenn kein Suchbegriff vorhanden ist, wende nur die Kategorie/Bereichsfilter an (diese wurden bereits oben gesetzt)
         
         # Sortieroption vorbereiten
         cursor = app.mongodb["recipes"].find(query)
