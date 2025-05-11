@@ -35,34 +35,35 @@ class InstructionItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
         // Nummer in einem Container
         Container(
-          margin: const EdgeInsets.only(right: 12),
-          padding: const EdgeInsets.all(8),
+          width: 80,
+          margin: const EdgeInsets.only(bottom: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           alignment: Alignment.center,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
             color: Theme.of(context).colorScheme.primaryContainer,
           ),
           child: Text(
-            index.toString(),
+            'Step $index',
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 14,
               fontWeight: FontWeight.bold,
               color: Theme.of(context).colorScheme.onPrimaryContainer,
             ),
           ),
         ),
 
-        // Text nimmt den restlichen Platz in der Zeile ein
-        Expanded(
-          child: Text(
-            text,
-            style: const TextStyle(fontSize: 16, color: Color(0xFF666666)),
-          ),
+        // Text darunter mit vollem Platz
+        Text(
+          text,
+          style: const TextStyle(fontSize: 16, color: Color(0xFF666666)),
         ),
       ],
     );

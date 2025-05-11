@@ -45,7 +45,7 @@ class SearchItem extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(top: 2), // Reduzierten Abstand
             child: Text(
-              recipe.cookingTime ?? '',
+              recipe.cookingTime,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(

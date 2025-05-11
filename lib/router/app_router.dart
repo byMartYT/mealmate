@@ -94,11 +94,16 @@ class TabScaffold extends StatelessWidget {
   final StatefulNavigationShell child;
 
   static const _tabs = [
-    (Routes.home, Icons.home, 'Home'),
-    (Routes.searchPath, Icons.search, 'Search'),
-    (Routes.cameraPath, Icons.camera_alt, 'Scan'),
-    (Routes.favoritesPath, Icons.star, 'Favs'),
-    (Routes.listPath, Icons.shopping_cart, 'List'),
+    (Routes.home, Icons.home_outlined, 'Home', Icons.home),
+    (Routes.searchPath, Icons.search, 'Search', Icons.search),
+    (Routes.cameraPath, Icons.camera_alt_outlined, 'Scan', Icons.camera_alt),
+    (Routes.favoritesPath, Icons.favorite_border, 'Favs', Icons.favorite),
+    (
+      Routes.listPath,
+      Icons.shopping_cart_outlined,
+      'List',
+      Icons.shopping_cart,
+    ),
   ];
 
   @override
@@ -121,8 +126,11 @@ class TabScaffold extends StatelessWidget {
         destinations:
             _tabs
                 .map(
-                  (tab) =>
-                      NavigationDestination(icon: Icon(tab.$2), label: tab.$3),
+                  (tab) => NavigationDestination(
+                    icon: Icon(tab.$2),
+                    label: tab.$3,
+                    selectedIcon: Icon(tab.$4),
+                  ),
                 )
                 .toList(),
       ),

@@ -20,7 +20,15 @@ class RecipeDetailPage extends ConsumerWidget {
           (recipe) =>
               recipe != null
                   ? Scaffold(
-                    appBar: AppBar(title: Text(recipe.title)),
+                    appBar: AppBar(
+                      title: Text(recipe.title),
+                      actions: [
+                        IconButton(
+                          onPressed: () {},
+                          icon: const Icon(Icons.favorite_border),
+                        ),
+                      ],
+                    ),
                     body: RecipeDetail(recipe),
                   )
                   : const Scaffold(
