@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mealmate_new/features/home/hero_carousel.dart';
 import 'package:mealmate_new/features/home/home_controller.dart';
 import 'package:mealmate_new/features/home/home_recipe_box.dart';
+import 'package:mealmate_new/main.dart';
 
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
@@ -21,7 +22,7 @@ class HomePage extends ConsumerWidget {
         HeroCarousel(recipes: homeState.popular),
         const SizedBox(height: 20),
         Padding(
-          padding: const EdgeInsets.all(16),
+          padding: kPadding,
           child: Column(
             children: [
               RecipeBox(

@@ -18,52 +18,43 @@ class SpoonacularRepository {
     String type = '',
     String diet = '',
     String sort = '',
+    String sortDirection = 'asc',
   }) async {
-    final res = await _dio.get(
-      '/recipes/complexSearch',
-      queryParameters: {
-        'query': q,
-        'number': limit,
-        'offset': offset,
-        'apiKey': _key,
-        'addRecipeInformation': true,
-        'type': type,
-        'diet': diet,
-        'sort': sort,
-        'sortDirection': 'desc',
-      },
-    );
-    return (res.data['results'] as List)
-        .map((j) => RecipeSummary.fromJson(j))
-        .toList();
-  }
-
-  Future<RecipeDetail> get(int id) async {
-    final res = await _dio.get(
-      '/recipes/$id/information',
-      queryParameters: {'apiKey': _key, 'includeNutrition': false},
-    );
-    return RecipeDetail.fromJson(res.data);
-  }
-
-  Future<List<RecipeDetail>> random(int number) async {
-    if (number <= 0) return Future.value([]);
-    final res = await _dio.get(
-      '/recipes/random',
-      queryParameters: {'number': number, 'apiKey': _key},
-    );
-    print(res.data);
-    return (res.data['recipes'] as List)
-        .map((j) => RecipeDetail.fromJson(j))
-        .toList();
+    try {
+      final res = await _dio.get(
+        '/recipes/complexSearch',
+        queryParameters: {
+          'query': q,
+          'number': limit,
+          'offset': offset,
+          'apiKey': _key,
+          'addRecipeInformation': true,
+          'type': type,
+          'diet': diet,
+          'sort': sort,
+          'sortDirection': sortDirection,
+        },
+      );
+      return (res.data['results'] as List)
+          .map((j) => RecipeSummary.fromJson(j))
+          .toList();
+    } catch (e) {
+      print('Error fetching search results: $e');
+      return [];
+    }
   }
 
   Future<List<RecipeDetail>> bulk(List<int> ids) async {
     if (ids.isEmpty) return [];
-    final res = await _dio.get(
-      '/recipes/informationBulk',
-      queryParameters: {'ids': ids.join(','), 'apiKey': _key},
-    );
-    return (res.data as List).map((j) => RecipeDetail.fromJson(j)).toList();
+    try {
+      final res = await _dio.get(
+        '/recipes/informationBulk',
+        queryParameters: {'ids': ids.join(','), 'apiKey': _key},
+      );
+      return (res.data as List).map((j) => RecipeDetail.fromJson(j)).toList();
+    } catch (e) {
+      print('Error fetching bulk recipe details: $e');
+      return [];
+    }
   }
 }

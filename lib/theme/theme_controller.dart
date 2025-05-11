@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final prefsProvider = Provider<SharedPreferences>(
@@ -31,6 +32,8 @@ final themeModeProvider = StateNotifierProvider<ThemeModeNotifier, ThemeMode>(
 
 final lightTheme = ThemeData(
   colorScheme: ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 32, 172, 0)),
+  scaffoldBackgroundColor: Color.fromARGB(255, 250, 253, 246),
+  textTheme: GoogleFonts.latoTextTheme(),
 );
 
 final darkTheme = ThemeData(
@@ -39,4 +42,5 @@ final darkTheme = ThemeData(
     seedColor: Color.fromARGB(255, 32, 172, 0),
     brightness: Brightness.dark,
   ),
+  textTheme: GoogleFonts.latoTextTheme(ThemeData.dark().textTheme),
 );

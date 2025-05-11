@@ -32,6 +32,8 @@ class SearchController extends StateNotifier<SearchState> {
   final SpoonacularRepository _repo;
   final String _query;
   static const _pageSize = 20;
+  String? _sort;
+  String _sortDir = 'asc';
 
   SearchController(this._repo, this._query) : super(const SearchState()) {
     _fetch();
@@ -39,13 +41,28 @@ class SearchController extends StateNotifier<SearchState> {
 
   Future<void> fetchNext() async {
     if (state.isLoading || !state.hasMore) return;
+    print('123');
+    await _fetch();
+  }
+
+  /// Change the sorting parameters and reload from page 1
+  Future<void> changeSort(String sort, String direction) async {
+    // Reset state and paging
+    state = const SearchState();
+    _sort = sort;
+    _sortDir = direction;
     await _fetch();
   }
 
   Future<void> _fetch() async {
     state = state.copyWith(isLoading: true);
     final nextPage = state.page + 1;
-    final data = await _repo.search(_query, (nextPage - 1) * _pageSize);
+    final data = await _repo.search(
+      _query,
+      (nextPage - 1) * _pageSize,
+      sort: _sort ?? 'asc',
+      sortDirection: _sortDir,
+    );
     state = state.copyWith(
       items: [...state.items, ...data],
       isLoading: false,

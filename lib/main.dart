@@ -6,6 +6,7 @@ import 'package:mealmate_new/theme/theme_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const kSpacing = 12.0;
+const EdgeInsets kPadding = EdgeInsets.symmetric(horizontal: 16.0);
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

@@ -1,47 +1,67 @@
-// lib/core/models/recipe_detail.dart
+import 'package:mealmate_new/models/ingredient.dart';
+
 class RecipeDetail {
+  final String id;
+  final String title;
+  final String imageType;
+  final String? cookingTime;
+  final String? servings;
+  final bool vegetarian;
+  final bool vegan;
+  final String? area;
+  final String? category;
+  final String image;
+  final List<String>? tags;
+  final List<String> instructions;
+  final List<Ingredient> ingredients;
+  final String? youtube;
+
   RecipeDetail({
     required this.id,
     required this.title,
+    this.imageType = 'jpg',
+    this.cookingTime,
+    this.servings,
+    this.vegetarian = false,
+    this.vegan = false,
+    this.area,
+    this.category,
     required this.image,
-    required this.servings,
-    required this.readyInMinutes,
-    required this.summaryHtml,
-    required this.imageType,
-    required this.extendedIngredients,
-    this.sourceName,
-    this.sourceUrl,
+    this.tags,
+    required this.instructions,
+    required this.ingredients,
+    this.youtube,
   });
 
-  final int id;
-  final String title;
-  final String image;
-  final int servings;
-  final String imageType;
-  final int readyInMinutes;
-
-  final String summaryHtml; // contains <b> tags
-  final List<Ingredient> extendedIngredients;
-
-  // optional meta
-  final String? sourceName;
-  final String? sourceUrl;
-
-  factory RecipeDetail.fromJson(Map<String, dynamic> j) => RecipeDetail(
-    id: j['id'] as int,
-    title: j['title'] as String,
-    image: j['image'] as String,
-    servings: j['servings'] as int,
-    imageType: j['imageType'] ?? 'jpg',
-    readyInMinutes: j['readyInMinutes'] as int,
-    summaryHtml: j['summary'] as String,
-    sourceName: j['sourceName'] as String?,
-    sourceUrl: j['sourceUrl'] as String?,
-    extendedIngredients:
-        (j['extendedIngredients'] as List<dynamic>)
-            .map((e) => Ingredient.fromJson(e as Map<String, dynamic>))
-            .toList(),
-  );
+  factory RecipeDetail.fromJson(Map<String, dynamic> json) {
+    // Konvertiere MongoDB ObjectId zu String, falls notwendig
+    final id = json['_id'] ?? json['id'];
+    
+    return RecipeDetail(
+      id: id.toString(),
+      title: json['title'],
+      imageType: json['imageType'] ?? 'jpg',
+      cookingTime: json['cookingTime'],
+      servings: json['servings'],
+      vegetarian: json['vegetarian'] ?? false,
+      vegan: json['vegan'] ?? false,
+      area: json['area'],
+      category: json['category'],
+      image: json['image'],
+      tags: json['tags'] != null 
+          ? List<String>.from(json['tags']) 
+          : null,
+      instructions: json['instructions'] != null
+          ? List<String>.from(json['instructions'])
+          : [],
+      ingredients: json['ingredients'] != null
+          ? (json['ingredients'] as List)
+              .map((e) => Ingredient.fromJson(e as Map<String, dynamic>))
+              .toList()
+          : [],
+      youtube: json['youtube'],
+    );
+  }
 
   String get imageUrlLarge =>
       'https://img.spoonacular.com/recipes/$id-636x393.$imageType';

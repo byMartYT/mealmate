@@ -13,10 +13,7 @@ class RecipeBox extends StatelessWidget {
     required this.recipes,
     required this.title,
     required this.repeat,
-  }) : assert(
-         recipes.length == repeat * 4,
-         'recipes.length must be 4 * repeat (${repeat * 4})',
-       );
+  });
 
   final List<RecipeSummary> recipes;
   final String title;
