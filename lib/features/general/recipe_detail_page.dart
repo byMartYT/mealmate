@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mealmate_new/features/favorites/favorites_provider.dart';
 import 'package:mealmate_new/features/general/ingredients_list.dart';
 import 'package:mealmate_new/features/general/recipe_detail_controller.dart';
 import 'package:mealmate_new/features/widgets/instructions_list.dart';
@@ -23,9 +24,25 @@ class RecipeDetailPage extends ConsumerWidget {
                     appBar: AppBar(
                       title: Text(recipe.title),
                       actions: [
-                        IconButton(
-                          onPressed: () {},
-                          icon: const Icon(Icons.favorite_border),
+                        Consumer(
+                          builder: (context, ref, _) {
+                            final isFavorite = ref
+                                .watch(favoritesProvider)
+                                .contains(recipe.id);
+                            return IconButton(
+                              onPressed: () {
+                                ref
+                                    .read(favoritesProvider.notifier)
+                                    .toggleFavorite(recipe.id);
+                              },
+                              icon: Icon(
+                                isFavorite
+                                    ? Icons.favorite
+                                    : Icons.favorite_border,
+                                color: isFavorite ? Colors.red : null,
+                              ),
+                            );
+                          },
                         ),
                       ],
                     ),
@@ -55,25 +72,28 @@ class RecipeDetail extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
-            spacing: 12,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (recipe.tags?.isNotEmpty == true) TagList(recipe.tags!),
+              if (recipe.tags?.isNotEmpty == true) ...[
+                TagList(recipe.tags!),
+                const SizedBox(height: 12),
+              ],
               Text(
                 recipe.title,
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
+              const SizedBox(height: 12),
               MetaList([
-                Meta(
-                  text: recipe.cookingTime,
-                  icon: Icons.room_service_outlined,
-                ),
-                Meta(text: recipe.servings, icon: Icons.timer_outlined),
+                Meta(text: recipe.cookingTime, icon: Icons.timer_outlined),
+                Meta(text: recipe.servings, icon: Icons.room_service_outlined),
               ]),
+              const SizedBox(height: 16),
               Divider(height: 1, color: Colors.grey[300], thickness: 1),
+              const SizedBox(height: 16),
               IngredientsList(recipe.ingredients),
-              const SizedBox(height: 2),
+              const SizedBox(height: 16),
               Divider(height: 1, color: Colors.grey[300], thickness: 1),
+              const SizedBox(height: 16),
               InstructionsList(recipe.instructions),
             ],
           ),
