@@ -31,7 +31,7 @@ class _HeroCarouselState extends State<HeroCarousel> {
 
     // Prefetch das erste Bild
     if (widget.recipes.isNotEmpty) {
-      precacheImage(NetworkImage(widget.recipes[0].imageUrlLarge), context);
+      precacheImage(NetworkImage(widget.recipes[0].image), context);
     }
   }
 
@@ -41,10 +41,7 @@ class _HeroCarouselState extends State<HeroCarousel> {
 
     // Prefetch das nächste Bild, wenn sich die Rezepte ändern
     if (_current < widget.recipes.length - 1) {
-      precacheImage(
-        NetworkImage(widget.recipes[_current + 1].imageUrlLarge),
-        context,
-      );
+      precacheImage(NetworkImage(widget.recipes[_current + 1].image), context);
     }
   }
 
@@ -110,7 +107,7 @@ class _HeroCarouselState extends State<HeroCarousel> {
                       );
                     },
                     child: Image.network(
-                      widget.recipes[_current].imageUrlLarge,
+                      widget.recipes[_current].image,
                       key: ValueKey<int>(_current),
                       height: MediaQuery.of(context).size.height * kHeroHeight,
                       width: double.infinity,
@@ -133,9 +130,7 @@ class _HeroCarouselState extends State<HeroCarousel> {
                     // Prefetch das nächste Bild
                     if (_current < widget.recipes.length - 1) {
                       precacheImage(
-                        NetworkImage(
-                          widget.recipes[_current + 1].imageUrlLarge,
-                        ),
+                        NetworkImage(widget.recipes[_current + 1].image),
                         context,
                       );
                     }

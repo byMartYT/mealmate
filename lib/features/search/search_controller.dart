@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mealmate_new/core/services/spoonacular.dart';
+import 'package:mealmate_new/core/services/backend_service.dart';
 import 'package:mealmate_new/models/recipe_summary.dart';
 
 class SearchState {
@@ -29,11 +29,13 @@ class SearchState {
 }
 
 class SearchController extends StateNotifier<SearchState> {
-  final SpoonacularRepository _repo;
+  final BackendRepository _repo;
   final String _query;
   static const _pageSize = 20;
   String? _sort;
   String _sortDir = 'asc';
+  String? _category;
+  String? _area;
 
   SearchController(this._repo, this._query) : super(const SearchState()) {
     _fetch();
@@ -41,34 +43,53 @@ class SearchController extends StateNotifier<SearchState> {
 
   Future<void> fetchNext() async {
     if (state.isLoading || !state.hasMore) return;
-    print('123');
     await _fetch();
   }
 
-  /// Change the sorting parameters and reload from page 1
+  /// Ändere die Sortierparameter und lade von Seite 1 neu
   Future<void> changeSort(String sort, String direction) async {
-    // Reset state and paging
+    // Zurücksetzen des Zustands und der Seitenzahlen
     state = const SearchState();
     _sort = sort;
     _sortDir = direction;
     await _fetch();
   }
 
+  /// Ändere die Filterkategorien und lade von Seite 1 neu
+  Future<void> changeFilter({String? category, String? area}) async {
+    // Zurücksetzen des Zustands und der Seitenzahlen
+    state = const SearchState();
+    _category = category;
+    _area = area;
+    await _fetch();
+  }
+
   Future<void> _fetch() async {
     state = state.copyWith(isLoading: true);
     final nextPage = state.page + 1;
-    final data = await _repo.search(
-      _query,
-      (nextPage - 1) * _pageSize,
-      sort: _sort ?? 'asc',
-      sortDirection: _sortDir,
-    );
-    state = state.copyWith(
-      items: [...state.items, ...data],
-      isLoading: false,
-      hasMore: data.length == _pageSize,
-      page: nextPage,
-    );
+
+    try {
+      // Verwende die backend_service Methode
+      final data = await _repo.search(
+        _query,
+        (nextPage - 1) * _pageSize,
+        limit: _pageSize,
+        category: _category ?? '',
+        area: _area ?? '',
+        sort: _sort ?? '',
+        sortDirection: _sortDir,
+      );
+
+      state = state.copyWith(
+        items: [...state.items, ...data],
+        isLoading: false,
+        hasMore: data.length == _pageSize,
+        page: nextPage,
+      );
+    } catch (e) {
+      print('Fehler beim Laden der Rezepte: $e');
+      state = state.copyWith(isLoading: false, hasMore: false);
+    }
   }
 }
 
@@ -77,5 +98,5 @@ final searchControllerProvider =
       ref,
       q,
     ) {
-      return SearchController(ref.watch(spoonRepoProvider), q);
+      return SearchController(ref.watch(backendRepoProvider), q);
     });

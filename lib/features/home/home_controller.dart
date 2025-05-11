@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mealmate_new/core/services/spoonacular.dart';
+import 'package:mealmate_new/core/services/backend_service.dart';
 import 'package:mealmate_new/models/recipe_summary.dart';
 
 class HomeState {
@@ -14,7 +14,7 @@ class HomeState {
 }
 
 class HomeController extends StateNotifier<HomeState> {
-  final SpoonacularRepository _repo;
+  final BackendRepository _repo;
   HomeController(this._repo) : super(HomeState()) {
     fetchInitial();
   }
@@ -25,24 +25,12 @@ class HomeController extends StateNotifier<HomeState> {
       random: state.random,
       isLoading: true,
     );
-    final popular = await _repo.search(
-      '',
-      0,
-      type: 'main course',
-      limit: 10,
-      sort: 'popularity',
-    );
-    final random = await _repo.search(
-      '',
-      0,
-      type: 'main course',
-      limit: 8,
-      sort: 'random',
-    );
+    final popular = await _repo.getHighlights();
+    final random = await _repo.search('', 0, limit: 8, sort: 'random');
     state = HomeState(popular: popular, random: random, isLoading: false);
   }
 }
 
 final homeControllerProvider = StateNotifierProvider<HomeController, HomeState>(
-  (ref) => HomeController(ref.watch(spoonRepoProvider)),
+  (ref) => HomeController(ref.watch(backendRepoProvider)),
 );

@@ -16,12 +16,12 @@ class HomeRecipeItem extends StatelessWidget {
     return HomeRecipeItem(
       title: recipe.title,
       id: recipe.id,
-      image: recipe.imageUrlMedium,
+      image: recipe.image,
     );
   }
 
   final String title;
-  final int id;
+  final String id;
   final String image;
 
   @override

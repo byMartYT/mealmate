@@ -1,5 +1,5 @@
-from pydantic import BaseModel, Field, HttpUrl
-from typing import List, Optional
+from pydantic import BaseModel, Field, HttpUrl, validator
+from typing import List, Optional, Union
 from bson import ObjectId
 from datetime import datetime
 
@@ -32,8 +32,25 @@ class RecipeBase(BaseModel):
     area: Optional[str] = None
     image: Optional[HttpUrl] = None
     tags: Optional[List[str]] = []
-    youtube: Optional[HttpUrl] = None
+    youtube: Optional[str] = None  # Änderung von HttpUrl zu str
     idMeal: Optional[str] = None
+
+    @validator('youtube', pre=True)
+    def validate_youtube_url(cls, v):
+        if v is None or v == "":
+            return None
+        # Einfache Überprüfung, ob es sich um eine YouTube-URL handelt
+        if v and isinstance(v, str) and "youtube.com" in v:
+            return v
+        if v and isinstance(v, str) and "youtu.be" in v:
+            return v
+        try:
+            # Versuche zu überprüfen, ob es eine gültige URL ist
+            HttpUrl.validate(v)
+            return v
+        except:
+            # Wenn nicht, gebe None zurück anstatt einen Fehler zu werfen
+            return None
 
 class RecipeCreate(RecipeBase):
     pass

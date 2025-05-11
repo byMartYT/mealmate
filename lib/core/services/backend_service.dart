@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mealmate_new/models/recipe_detail.dart';
 import 'package:mealmate_new/models/recipe_summary.dart';
 
 final backendRepoProvider = Provider((_) => BackendRepository());
@@ -9,11 +8,13 @@ final backendRepoProvider = Provider((_) => BackendRepository());
 class BackendRepository {
   // Hier solltest du die URL deines Backends anpassen
   // Für Emulatoren: Android = 10.0.2.2, iOS = localhost
-  final Dio _dio = Dio(BaseOptions(
-    baseUrl: 'http://10.0.2.2:8000',
-    connectTimeout: const Duration(seconds: 5),
-    receiveTimeout: const Duration(seconds: 10),
-  ));
+  final Dio _dio = Dio(
+    BaseOptions(
+      baseUrl: 'http://localhost:8000',
+      connectTimeout: const Duration(seconds: 5),
+      receiveTimeout: const Duration(seconds: 10),
+    ),
+  );
 
   /// Sucht nach Rezepten mit den angegebenen Parametern
   Future<List<RecipeSummary>> search(
@@ -39,11 +40,25 @@ class BackendRepository {
           'sort_dir': sortDirection,
         },
       );
-      
+
       // Direkte Liste von Rezepten zurückgeben
-      return (res.data as List).map((json) => RecipeSummary.fromJson(json)).toList();
+      return (res.data as List)
+          .map((json) => RecipeSummary.fromJson(json))
+          .toList();
     } catch (e) {
       print('Fehler beim Abrufen der Suchergebnisse: $e');
+      return [];
+    }
+  }
+
+  Future<List<RecipeSummary>> getHighlights() async {
+    try {
+      final res = await _dio.get('/recipes/highlights');
+      return (res.data as List)
+          .map((json) => RecipeSummary.fromJson(json))
+          .toList();
+    } catch (e) {
+      print('Fehler beim Abrufen der Highlights: $e');
       return [];
     }
   }
@@ -71,15 +86,13 @@ class BackendRepository {
           'sort_dir': sortDirection,
         },
       );
-      
-      final recipes = (res.data['recipes'] as List)
-          .map((json) => RecipeSummary.fromJson(json))
-          .toList();
-      
-      return {
-        'total': res.data['total'],
-        'recipes': recipes,
-      };
+
+      final recipes =
+          (res.data['recipes'] as List)
+              .map((json) => RecipeSummary.fromJson(json))
+              .toList();
+
+      return {'total': res.data['total'], 'recipes': recipes};
     } catch (e) {
       print('Fehler bei der erweiterten Suche: $e');
       return {'total': 0, 'recipes': <RecipeSummary>[]};
@@ -87,10 +100,10 @@ class BackendRepository {
   }
 
   /// Holt ein einzelnes Rezept anhand seiner ID
-  Future<RecipeDetail?> getRecipeById(String id) async {
+  Future<RecipeSummary?> getRecipeById(String id) async {
     try {
       final res = await _dio.get('/recipes/$id');
-      return RecipeDetail.fromJson(res.data);
+      return RecipeSummary.fromJson(res.data);
     } catch (e) {
       print('Fehler beim Abrufen des Rezepts mit ID $id: $e');
       return null;

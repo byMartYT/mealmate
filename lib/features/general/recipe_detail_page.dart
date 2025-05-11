@@ -1,18 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mealmate_new/core/services/spoonacular.dart';
-import 'package:mealmate_new/models/recipe_detail.dart';
-
-final recipeDetailProvider = FutureProvider.family<RecipeDetail, int>((
-  ref,
-  id,
-) {
-  final repo = ref.read(spoonRepoProvider);
-  return repo.bulk([id]).then((list) => list.first);
-});
+import 'package:mealmate_new/features/general/recipe_detail_controller.dart';
 
 class RecipeDetailPage extends ConsumerWidget {
-  final int id;
+  final String id;
   const RecipeDetailPage({super.key, required this.id});
 
   @override
@@ -21,10 +12,15 @@ class RecipeDetailPage extends ConsumerWidget {
 
     return detailAsync.when(
       data:
-          (recipe) => Scaffold(
-            appBar: AppBar(title: Text(recipe.title)),
-            body: Center(),
-          ),
+          (recipe) =>
+              recipe != null
+                  ? Scaffold(
+                    appBar: AppBar(title: Text(recipe.title)),
+                    body: Center(),
+                  )
+                  : const Scaffold(
+                    body: Center(child: Text('Rezept nicht gefunden')),
+                  ),
       loading:
           () =>
               const Scaffold(body: Center(child: CircularProgressIndicator())),

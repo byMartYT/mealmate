@@ -20,7 +20,7 @@ class SearchItem extends StatelessWidget {
               child: Image.network(
                 height: 180,
                 width: double.infinity,
-                recipe.imageUrlMedium,
+                recipe.image,
                 fit: BoxFit.cover,
               ),
             ),
@@ -35,9 +35,7 @@ class SearchItem extends StatelessWidget {
             ),
           ),
           Text(
-            recipe.readyInMinutes == 0
-                ? 'Unknown time'
-                : '${recipe.readyInMinutes} min',
+            recipe.cookingTime!,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(fontSize: 12, color: Color.fromARGB(153, 0, 0, 0)),

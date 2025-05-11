@@ -28,7 +28,7 @@ class RecipeSummary {
   factory RecipeSummary.fromJson(Map<String, dynamic> json) {
     // Konvertiere MongoDB ObjectId zu String, falls notwendig
     final id = json['_id'] ?? json['id'];
-    
+
     return RecipeSummary(
       id: id.toString(),
       title: json['title'],
@@ -40,9 +40,7 @@ class RecipeSummary {
       area: json['area'],
       category: json['category'],
       image: json['image'],
-      tags: json['tags'] != null 
-          ? List<String>.from(json['tags']) 
-          : null,
+      tags: json['tags'] != null ? List<String>.from(json['tags']) : null,
     );
   }
 

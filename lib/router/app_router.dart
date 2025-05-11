@@ -36,7 +36,7 @@ final router = GoRouter(
                   path: 'detail',
                   builder:
                       (context, state) =>
-                          RecipeDetailPage(id: state.extra as int),
+                          RecipeDetailPage(id: state.extra as String),
                 ),
               ],
             ),
