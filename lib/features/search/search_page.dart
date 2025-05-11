@@ -37,7 +37,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     final max = _scrollController.position.maxScrollExtent;
     final pos = _scrollController.position.pixels;
     if (pos >= max - 200) {
-      ref.read(searchControllerProvider('').notifier).fetchNext();
+      ref.read(searchControllerProvider(_query).notifier).fetchNext();
     }
   }
 
