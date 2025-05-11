@@ -23,8 +23,6 @@ class BackendRepository {
     int limit = 20,
     String category = '',
     String area = '',
-    String sort = '',
-    String sortDirection = 'asc',
   }) async {
     try {
       // Verwende die in Backend implementierten Parameter
@@ -36,8 +34,6 @@ class BackendRepository {
           'limit': limit,
           if (category.isNotEmpty) 'category': category,
           if (area.isNotEmpty) 'area': area,
-          if (sort.isNotEmpty) 'sort_by': sort,
-          'sort_dir': sortDirection,
         },
       );
 
@@ -63,6 +59,22 @@ class BackendRepository {
     }
   }
 
+  /// Holt eine zufällige Auswahl von Rezepten
+  Future<List<RecipeSummary>> getRandomRecipes({int limit = 5}) async {
+    try {
+      final res = await _dio.get(
+        '/recipes/random',
+        queryParameters: {'limit': limit},
+      );
+      return (res.data as List)
+          .map((json) => RecipeSummary.fromJson(json))
+          .toList();
+    } catch (e) {
+      print('Fehler beim Abrufen zufälliger Rezepte: $e');
+      return [];
+    }
+  }
+
   /// Detaillierte Suche mit zusätzlichen Parametern
   Future<Map<String, dynamic>> advancedSearch(
     String q, {
@@ -70,8 +82,6 @@ class BackendRepository {
     int limit = 20,
     String category = '',
     String area = '',
-    String sort = '',
-    String sortDirection = 'asc',
   }) async {
     try {
       final res = await _dio.get(
@@ -82,8 +92,6 @@ class BackendRepository {
           'limit': limit,
           if (category.isNotEmpty) 'category': category,
           if (area.isNotEmpty) 'area': area,
-          if (sort.isNotEmpty) 'sort_by': sort,
-          'sort_dir': sortDirection,
         },
       );
 

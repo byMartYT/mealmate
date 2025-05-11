@@ -177,6 +177,34 @@ async def get_highlighted_recipes():
     
     return recipes
 
+@app.get('/recipes/random', response_model=List[Recipe])
+async def get_random_recipes(limit: int = 5):
+    """
+    Liefert eine zufällige Auswahl von Rezepten.
+    
+    - limit: Anzahl der zurückzugebenden Rezepte
+    """
+    # Die MongoDB-Aggregationspipeline für zufällige Dokumente
+    pipeline = [
+        {"$sample": {"size": limit}}
+    ]
+    
+    recipes = await app.mongodb["recipes"].aggregate(pipeline).to_list(limit)
+    
+    # Konvertiere ObjectId zu String und stelle sicher, dass cookingTime und servings Strings sind
+    for recipe in recipes:
+        recipe["_id"] = str(recipe["_id"])
+        
+        # Konvertiere cookingTime zu String, falls es eine Zahl ist
+        if "cookingTime" in recipe and not isinstance(recipe["cookingTime"], str):
+            recipe["cookingTime"] = f"{recipe['cookingTime']} Min"
+            
+        # Konvertiere servings zu String, falls es eine Zahl ist
+        if "servings" in recipe and not isinstance(recipe["servings"], str):
+            recipe["servings"] = f"{recipe['servings']} servings"
+    
+    return recipes
+
 @app.get("/recipes/{recipe_id}", response_model=Recipe)
 async def get_recipe(recipe_id: str):
     """

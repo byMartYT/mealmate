@@ -32,8 +32,6 @@ class SearchController extends StateNotifier<SearchState> {
   final BackendRepository _repo;
   final String _query;
   static const _pageSize = 20;
-  String? _sort;
-  String _sortDir = 'asc';
   String? _category;
   String? _area;
 
@@ -43,15 +41,6 @@ class SearchController extends StateNotifier<SearchState> {
 
   Future<void> fetchNext() async {
     if (state.isLoading || !state.hasMore) return;
-    await _fetch();
-  }
-
-  /// Ändere die Sortierparameter und lade von Seite 1 neu
-  Future<void> changeSort(String sort, String direction) async {
-    // Zurücksetzen des Zustands und der Seitenzahlen
-    state = const SearchState();
-    _sort = sort;
-    _sortDir = direction;
     await _fetch();
   }
 
@@ -76,8 +65,6 @@ class SearchController extends StateNotifier<SearchState> {
         limit: _pageSize,
         category: _category ?? '',
         area: _area ?? '',
-        sort: _sort ?? '',
-        sortDirection: _sortDir,
       );
 
       state = state.copyWith(

@@ -47,6 +47,14 @@ final router = GoRouter(
             GoRoute(
               path: Routes.searchPath,
               builder: (context, state) => SearchPage(),
+              routes: [
+                GoRoute(
+                  path: 'detail',
+                  builder:
+                      (context, state) =>
+                          RecipeDetailPage(id: state.extra as String),
+                ),
+              ],
             ),
           ],
         ),

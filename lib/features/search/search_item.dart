@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mealmate_new/main.dart';
 import 'package:mealmate_new/models/recipe_summary.dart';
 
@@ -10,6 +11,11 @@ class SearchItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
+      onTap:
+          () => context.push(
+            '${GoRouterState.of(context).matchedLocation}/detail',
+            extra: recipe.id,
+          ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: kSpacing,

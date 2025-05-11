@@ -7,8 +7,6 @@ import 'search_controller.dart';
 
 enum FilterOption { none /*, vegetarian, glutenFree, ...*/ }
 
-enum SortOption { none, metaScore, popularity, healthiness, price, time }
-
 class SearchPage extends ConsumerStatefulWidget {
   const SearchPage({super.key});
 
@@ -21,7 +19,6 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   final _searchController = TextEditingController();
   String _query = '';
   FilterOption _filter = FilterOption.none;
-  SortOption _sort = SortOption.none;
 
   @override
   void initState() {
@@ -70,40 +67,6 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     }
   }
 
-  Future<void> _showSortDialog() async {
-    final choice = await showModalBottomSheet<SortOption>(
-      context: context,
-      builder: (_) {
-        return ListView(
-          children:
-              SortOption.values.map((opt) {
-                return RadioListTile<SortOption>(
-                  title: Text(opt.name),
-                  value: opt,
-                  groupValue: _sort,
-                  onChanged: (v) => Navigator.pop(context, v),
-                );
-              }).toList(),
-        );
-      },
-    );
-    if (choice == null || choice == _sort) return;
-    setState(() => _sort = choice);
-    final sortParam =
-        {
-          SortOption.none: '',
-          SortOption.metaScore: 'meta-score',
-          SortOption.popularity: 'popularity',
-          SortOption.healthiness: 'healthiness',
-          SortOption.price: 'price',
-          SortOption.time: 'time',
-        }[choice];
-    final ctrl = ref.read(searchControllerProvider(_query).notifier);
-    if (sortParam != null) {
-      await ctrl.changeSort(sortParam, 'asc');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(searchControllerProvider(_query));
@@ -138,11 +101,6 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             icon: const Icon(Icons.filter_list),
             tooltip: 'Filter',
             onPressed: _showFilterDialog,
-          ),
-          IconButton(
-            icon: const Icon(Icons.sort),
-            tooltip: 'Sort',
-            onPressed: _showSortDialog,
           ),
         ],
       ),
