@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mealmate_new/features/favorites/favorites_provider.dart';
 import 'package:mealmate_new/features/general/ingredients_list.dart';
 import 'package:mealmate_new/features/general/recipe_detail_controller.dart';
+import 'package:mealmate_new/features/widgets/add_ingredients_button.dart';
 import 'package:mealmate_new/features/widgets/instructions_list.dart';
 import 'package:mealmate_new/features/widgets/meta_list.dart';
 import 'package:mealmate_new/features/widgets/tag_list.dart';
@@ -87,6 +88,8 @@ class RecipeDetail extends StatelessWidget {
                 Meta(text: recipe.cookingTime, icon: Icons.timer_outlined),
                 Meta(text: recipe.servings, icon: Icons.room_service_outlined),
               ]),
+              const SizedBox(height: 16),
+              AddIngredientsButton(recipe: recipe),
               const SizedBox(height: 16),
               Divider(height: 1, color: Colors.grey[300], thickness: 1),
               const SizedBox(height: 16),

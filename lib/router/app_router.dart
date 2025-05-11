@@ -71,6 +71,14 @@ final router = GoRouter(
             GoRoute(
               path: Routes.favoritesPath,
               builder: (context, state) => FavoritesPage(),
+              routes: [
+                GoRoute(
+                  path: 'detail',
+                  builder:
+                      (context, state) =>
+                          RecipeDetailPage(id: state.extra as String),
+                ),
+              ],
             ),
           ],
         ),
