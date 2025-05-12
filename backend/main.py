@@ -1,11 +1,17 @@
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from motor.motor_asyncio import AsyncIOMotorClient
 from bson import ObjectId
 from typing import List, Optional
 import os
+import base64
+from datetime import datetime
 from dotenv import load_dotenv
-from models import Recipe, RecipeInDB, RecipeCreate, RecipeUpdate
+from models import Recipe
+from image_models import ImageResponse, ImageUpload
+from ingredient_models import IngredientsResponse
+from llm_service import LLMService
 
 # Lade die Umgebungsvariablen
 load_dotenv()
@@ -34,10 +40,18 @@ DB_NAME = os.getenv("DB_NAME", "mealmate")
 async def startup_db_client():
     app.mongodb_client = AsyncIOMotorClient(MONGODB_URL)
     app.mongodb = app.mongodb_client[DB_NAME]
+    
+    # Erstelle Upload-Verzeichnis, falls es nicht existiert
+    UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "uploads")
+    os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
     app.mongodb_client.close()
+
+# Statische Dateien für Uploads bereitstellen
+UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "uploads")
+app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 
 # Endpunkte für Rezepte
 @app.get("/recipes", response_model=List[Recipe])
@@ -371,6 +385,58 @@ async def search_recipes(
         "recipes": recipes
     }
 
+
+@app.post("/detect-ingredients", response_model=IngredientsResponse)
+async def detect_ingredients(upload: ImageUpload):
+    """
+    Analysiert Base64-codierte Bilder mit Azure OpenAI, um Lebensmittelzutaten zu erkennen.
+    
+    - Prüft, ob mindestens ein Bild enthalten ist
+    - Analysiert die Bilder mit Azure OpenAI
+    - Gibt eine Liste der erkannten Zutaten zurück
+    """
+    # Überprüfe, ob Bilder gesendet wurden
+    if not upload.images or len(upload.images) == 0:
+        return IngredientsResponse(
+            success=False,
+            message="Keine Bilder gefunden",
+            error="Es wurde mindestens ein Bild erwartet"
+        )
+    
+    try:
+        # LLM-Service instanziieren
+        llm_service = LLMService()
+        
+        # Speichere die Bilder zur späteren Verwendung (optional)
+        image_files = []
+        for i, base64_image in enumerate(upload.images):
+            # Generiere einen eindeutigen Dateinamen
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            filename = f"food_image_{timestamp}_{i}.jpg"
+            file_path = os.path.join(UPLOAD_DIR, filename)
+            
+            try:
+                # Dekodiere und speichere das Bild
+                with open(file_path, "wb") as f:
+                    f.write(base64.b64decode(base64_image))
+                image_files.append(file_path)
+            except Exception as e:
+                print(f"Fehler beim Speichern des Bildes: {e}")
+                # Fahre fort, auch wenn das Speichern fehlschlägt
+        
+        # Analysiere die Bilder mit Azure OpenAI
+        ingredients_response = llm_service.analyze_images(upload.images)
+        
+        return ingredients_response
+        
+    except Exception as e:
+        return IngredientsResponse(
+            success=False,
+            message="Fehler bei der Analyse der Bilder",
+            error=str(e)
+        )
+    
+    
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)

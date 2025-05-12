@@ -6,6 +6,7 @@ import 'package:mealmate_new/features/shopping_list/shopping_page.dart';
 import '../features/home/home_page.dart';
 import '../features/search/search_page.dart';
 import '../features/camera/camera_page.dart';
+import '../features/camera/image_preview_page.dart';
 
 final _shellKey = GlobalKey<NavigatorState>();
 

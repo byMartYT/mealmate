@@ -139,4 +139,47 @@ class BackendRepository {
       return [];
     }
   }
+
+  /// Lädt Base64-codierte Bilder hoch und gibt die URLs zurück
+  Future<Map<String, dynamic>> uploadImages(List<String> base64Images) async {
+    try {
+      final res = await _dio.post(
+        '/upload-images',
+        data: {'images': base64Images},
+      );
+
+      return {
+        'success': res.data['success'],
+        'message': res.data['message'],
+        'imageUrls': res.data['image_urls'] ?? [],
+        'error': res.data['error'],
+      };
+    } catch (e) {
+      print('Fehler beim Hochladen der Bilder: $e');
+      return {
+        'success': false,
+        'message': 'Fehler beim Hochladen der Bilder',
+        'imageUrls': <String>[],
+        'error': e.toString(),
+      };
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> detectIngredients(
+    List<String> base64Images,
+  ) async {
+    try {
+      final res = await _dio.post(
+        '/detect-ingredients',
+        data: {'images': base64Images},
+      );
+
+      return (res.data['scans'] as List)
+          .map((json) => json as Map<String, dynamic>)
+          .toList();
+    } catch (e) {
+      print('Fehler beim Hochladen des Scans: $e');
+      return [];
+    }
+  }
 }
