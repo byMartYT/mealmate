@@ -50,10 +50,6 @@ async def startup_db_client():
 async def shutdown_db_client():
     app.mongodb_client.close()
 
-# Statische Dateien für Uploads bereitstellen
-UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "uploads")
-app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
-
 # Endpunkte für Rezepte
 @app.get("/recipes", response_model=List[Recipe])
 async def get_recipes(
@@ -254,6 +250,32 @@ async def generate_recipe_list(ingredients: List[IngredientItem]):
     recipes = llm_service.generate_recipes(ingredient_list)
     
     return recipes
+
+@app.post('/recipes/generate/details')
+async def generate_recipe_details(data: dict):
+    """
+    Generiert ein detailliertes Rezept basierend auf dem angegebenen Rezepttitel und den verfügbaren Zutaten.
+    
+    - data: Dictionary mit "recipe_title" und "ingredients"-Liste
+    """
+    if not data or "recipe_title" not in data or "ingredients" not in data:
+        raise HTTPException(status_code=400, detail="Rezepttitel und Zutaten sind erforderlich")
+    
+    recipe_title = data["recipe_title"]
+    ingredients = data["ingredients"]
+    
+    # Extrahiere nur die Namen der Zutaten, falls vollständige IngredientItems übergeben wurden
+    ingredient_list = []
+    for ingredient in ingredients:
+        if isinstance(ingredient, dict) and "name" in ingredient:
+            ingredient_list.append(ingredient["name"])
+        else:
+            ingredient_list.append(ingredient)
+    
+    # Verwende den LLM-Service, um ein detailliertes Rezept zu generieren
+    recipe_details = llm_service.generate_recipe_details(recipe_title, ingredient_list)
+    
+    return recipe_details
 
 @app.get("/recipes/{recipe_id}", response_model=Recipe)
 async def get_recipe(recipe_id: str):

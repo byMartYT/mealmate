@@ -182,20 +182,188 @@ def generate_recipes(ingredients: List[str]) -> List[str]:
         response = llm.invoke([system_message, human_message])
         content = response.content
         
-        # Parse the response as JSON
-        recipe_list = json.loads(content)
-
-        print(recipe_list)
+        print(f"LLM response content: {content}")
         
-        # Ensure the result is a list of strings
-        if isinstance(recipe_list, list):
-            # Take up to 10 recipes
-            return recipe_list[:5]
-        else:
-            raise ValueError(f"Invalid response format: {recipe_list}")
+        # Prüfen, ob der Inhalt leer ist
+        if not content or content.isspace():
+            print("Error: Received empty content from LLM")
+            return ["No recipes found. Please try again with different ingredients."]
+            
+        # Bereinige den Inhalt von Markdown-Formatierungen
+        # Entferne ```json oder ``` am Anfang und Ende der Antwort
+        if content.strip().startswith("```"):
+            # Finde den Index des ersten Zeilenumbruchs nach den Backticks
+            first_line_break = content.find("\n")
+            if first_line_break != -1:
+                # Entferne die erste Zeile mit den Backticks
+                content = content[first_line_break:].strip()
+            
+            # Entferne auch abschließende Backticks, falls vorhanden
+            if content.strip().endswith("```"):
+                content = content.strip()[:-3].strip()
+                
+        print(f"Cleaned recipe JSON content: {content}")
+        
+        try:
+            # Parse the response as JSON
+            recipe_list = json.loads(content)
+            print(f"Parsed recipe list: {recipe_list}")
+            
+            # Ensure the result is a list of strings
+            if isinstance(recipe_list, list):
+                # Take up to 5 recipes
+                return recipe_list[:5]
+            else:
+                print(f"Invalid response format (not a list): {recipe_list}")
+                return ["Unable to generate recipes. Please try with different ingredients."]
+                
+        except json.JSONDecodeError as json_err:
+            # If JSON parsing fails, attempt to extract a list from the text
+            print(f"JSON parsing error: {json_err}")
+            print(f"Attempting to extract recipe list from text: {content}")
+            
+            # Versuche, die Liste aus dem Text zu extrahieren
+            import re
+            recipe_matches = re.findall(r'"([^"]+)"', content)
+            if recipe_matches:
+                print(f"Extracted recipe titles: {recipe_matches}")
+                return recipe_matches[:5]
+            
+            # If all else fails, return an error message
+            return ["Error parsing recipes. Please try again."]
             
     except Exception as e:
         # In case of error, return a descriptive message
         print(f"Error generating recipes: {str(e)}")
         return ["Unable to generate recipes. Please try again."]
+
+
+def generate_recipe_details(recipe_title: str, ingredients: List[str]) -> Dict[str, Any]:
+    """
+    Generates detailed recipe information based on the recipe title and available ingredients.
+    
+    Args:
+        recipe_title: The name/title of the recipe to generate
+        ingredients: List of ingredient names available to the user
+        
+    Returns:
+        Dict: A detailed recipe including ingredients, instructions, cooking time, etc.
+    """
+    if not recipe_title:
+        return {"error": "No recipe title provided"}
+    
+    try:
+        # Format the ingredient list for the prompt
+        ingredients_text = ", ".join(ingredients)
+        
+        # Create a prompt for detailed recipe generation
+        prompt = f"""Generate a complete recipe for "{recipe_title}" using these available ingredients: {ingredients_text}.
+        You can assume basic pantry items like salt, pepper, oil, common spices, and water are available.
+        
+        The recipe should be practical and easy to follow for home cooks.
+        European measurements are preferred (grams, liters, etc.).
+        
+        Please format your response as a JSON object with the following structure:
+        {{
+            "title": "Recipe Title",
+            "description": "A brief description of the dish",
+            "prepTime": "Preparation time in minutes",
+            "cookTime": "Cooking time in minutes",
+            "servings": "Number of servings",
+            "ingredients": [
+                {{"name": "Ingredient 1", "measure": "measure"}},
+                {{"name": "Ingredient 2", "measure": "measure"}},
+                ...
+            ],
+            "instructions": [
+                "Step 1 instruction",
+                "Step 2 instruction",
+                ...
+            ],
+            "tips": "Optional cooking tips"
+        }}
+        """
+        
+        # Call the LLM without an image
+        system_message = SystemMessage(
+            content="You are a professional chef. Respond with valid JSON only."
+        )
+        
+        human_message = HumanMessage(content=prompt)
+        
+        # Invoke the LLM with the messages
+        response = llm.invoke([system_message, human_message])
+        content = response.content
+        
+        print(f"Recipe details LLM response: {content[:500]}...") # Nur die ersten 500 Zeichen für bessere Lesbarkeit
+        
+        # Prüfen, ob der Inhalt leer ist
+        if not content or content.isspace():
+            print("Error: Received empty content from LLM when generating recipe details")
+            return {
+                "title": recipe_title,
+                "error": "Empty response from AI service",
+                "ingredients": [],
+                "instructions": ["Unable to generate recipe instructions. Please try again."]
+            }
+            
+        # Bereinige den Inhalt von Markdown-Formatierungen
+        # Entferne ```json oder ``` am Anfang und Ende der Antwort
+        if content.strip().startswith("```"):
+            # Finde den Index des ersten Zeilenumbruchs nach den Backticks
+            first_line_break = content.find("\n")
+            if first_line_break != -1:
+                # Entferne die erste Zeile mit den Backticks
+                content = content[first_line_break:].strip()
+            
+            # Entferne auch abschließende Backticks, falls vorhanden
+            if content.strip().endswith("```"):
+                content = content.strip()[:-3].strip()
+                
+        print(f"Cleaned JSON content: {content[:100]}...") # Die ersten 100 Zeichen der bereinigten Antwort
+        
+        try:
+            # Parse the response as JSON
+            recipe_details = json.loads(content)
+            print(f"Generated recipe details for: {recipe_title}")
+            
+            # Stellen Sie sicher, dass alle erforderlichen Felder vorhanden sind
+            required_fields = ["title", "ingredients", "instructions"]
+            for field in required_fields:
+                if field not in recipe_details:
+                    recipe_details[field] = [] if field in ["ingredients", "instructions"] else recipe_title
+            
+            return recipe_details
+                
+        except json.JSONDecodeError as json_err:
+            # If JSON parsing fails, create a minimal recipe with the error
+            print(f"JSON parsing error in recipe details: {json_err}")
+            
+            # Versuche, zumindest die Anweisungen aus dem Text zu extrahieren
+            instructions = []
+            if "1." in content or "Step 1" in content:
+                # Versuche, die Anweisungen zu extrahieren
+                import re
+                steps = re.split(r'\d+\.|\nStep \d+:', content)
+                if len(steps) > 1:
+                    instructions = [step.strip() for step in steps[1:] if step.strip()]
+            
+            return {
+                "title": recipe_title,
+                "error": f"Error parsing recipe details: {str(json_err)}",
+                "description": "We had trouble formatting this recipe properly.",
+                "ingredients": [],
+                "instructions": instructions if instructions else ["Unable to generate recipe instructions. Please try again."]
+            }
+            
+    except Exception as e:
+        # In case of error, return a descriptive error message
+        error_msg = f"Error generating recipe details: {str(e)}"
+        print(error_msg)
+        return {
+            "title": recipe_title,
+            "error": error_msg,
+            "ingredients": [],
+            "instructions": ["Unable to generate recipe instructions. Please try again."]
+        }
 

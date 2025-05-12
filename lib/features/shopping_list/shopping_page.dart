@@ -90,7 +90,7 @@ class ShoppingPage extends ConsumerWidget {
                     (recipeName) => Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Card(
-                        color: Theme.of(context).primaryColor.withOpacity(0.1),
+                        color: Theme.of(context).primaryColor.withAlpha(25),
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Row(
@@ -148,6 +148,8 @@ class ShoppingPage extends ConsumerWidget {
   Widget _buildRecipeImage(List<ShoppingListItem> items, String recipeName) {
     // Finde das erste Item mit diesem Rezeptnamen
     final item = items.firstWhere((item) => item.recipeName == recipeName);
+
+    if (item.recipeImage == '_') null;
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(4),

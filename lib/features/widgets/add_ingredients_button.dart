@@ -5,9 +5,9 @@ import 'package:mealmate_new/features/shopping_list/shopping_list_provider.dart'
 import 'package:mealmate_new/models/recipe_summary.dart';
 
 class AddIngredientsButton extends ConsumerWidget {
-  final RecipeSummary? recipe;
+  final RecipeSummary recipe;
 
-  const AddIngredientsButton({super.key, this.recipe});
+  const AddIngredientsButton({super.key, required this.recipe});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -26,40 +26,37 @@ class AddIngredientsButton extends ConsumerWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withAlpha(25),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
         ],
       ),
       child: ElevatedButton(
-        onPressed:
-            recipe == null
-                ? null
-                : () async {
-                  // Füge alle Zutaten des Rezepts zur Einkaufsliste hinzu
-                  await ref
-                      .read(shoppingListProvider.notifier)
-                      .addRecipeIngredients(recipe!);
+        onPressed: () async {
+          // Füge alle Zutaten des Rezepts zur Einkaufsliste hinzu
+          await ref
+              .read(shoppingListProvider.notifier)
+              .addRecipeIngredients(recipe!);
 
-                  // Zeige Feedback
-                  if (!context.mounted) return;
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        '${recipe!.ingredients.length} ingredients added to shopping list',
-                      ),
-                      duration: const Duration(seconds: 2),
-                      action: SnackBarAction(
-                        label: 'Anzeigen',
-                        onPressed: () {
-                          // Navigiere zur Einkaufsliste mit GoRouter
-                          GoRouter.of(context).go('/list');
-                        },
-                      ),
-                    ),
-                  );
+          // Zeige Feedback
+          if (!context.mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                '${recipe!.ingredients.length} ingredients added to shopping list',
+              ),
+              duration: const Duration(seconds: 2),
+              action: SnackBarAction(
+                label: 'Anzeigen',
+                onPressed: () {
+                  // Navigiere zur Einkaufsliste mit GoRouter
+                  GoRouter.of(context).go('/list');
                 },
+              ),
+            ),
+          );
+        },
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.transparent,
           foregroundColor: Colors.white,

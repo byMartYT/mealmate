@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mealmate_new/features/camera/ingredients_detection_provider.dart';
+import 'package:mealmate_new/features/camera/recipe_detail_page.dart';
 import 'package:mealmate_new/models/detected_ingredient.dart';
 
 class IngredientsResultPage extends ConsumerWidget {
@@ -253,12 +254,18 @@ class IngredientsResultPage extends ConsumerWidget {
                       title: Text(recipes[index]),
                       trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                       onTap: () {
-                        // TODO: Hier könnte man zur Rezeptdetailseite navigieren
+                        // Schließe den Modal
                         Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Selected: ${recipes[index]}'),
-                            duration: const Duration(seconds: 2),
+
+                        // Navigiere zur Rezeptdetailseite mit dem ausgewählten Rezept
+                        final selectedRecipe = recipes[index];
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (context) => RecipeDetailPage(
+                                  recipeTitle: selectedRecipe,
+                                ),
                           ),
                         );
                       },

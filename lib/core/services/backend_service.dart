@@ -200,16 +200,38 @@ class BackendRepository {
   ) async {
     try {
       print(ingredients);
-      final res = await _dio.post(
-        '/recipes/generate/list',
-        data: ingredients,
-      );
+      final res = await _dio.post('/recipes/generate/list', data: ingredients);
 
       // Konvertiere das Ergebnis in eine Liste von Strings
       return (res.data as List).cast<String>();
     } catch (e) {
       print('Error getting recipe recommendations: $e');
       return ['Failed to get recommendations: ${e.toString()}'];
+    }
+  }
+
+  /// Generiert ein detailliertes Rezept basierend auf Titel und verfügbaren Zutaten
+  Future<Map<String, dynamic>> getRecipeDetails(
+    String recipeTitle,
+    List<Map<String, dynamic>> ingredients,
+  ) async {
+    try {
+      final res = await _dio.post(
+        '/recipes/generate/details',
+        data: {'recipe_title': recipeTitle, 'ingredients': ingredients},
+      );
+
+      return res.data as Map<String, dynamic>;
+    } catch (e) {
+      print('Error generating recipe details: $e');
+      return {
+        'error': 'Failed to generate recipe details: ${e.toString()}',
+        'title': recipeTitle,
+        'ingredients': [],
+        'instructions': [
+          'Unable to generate recipe instructions. Please try again.',
+        ],
+      };
     }
   }
 }
