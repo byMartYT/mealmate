@@ -28,7 +28,10 @@ class HomeRecipeItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        GoRouter.of(context).push('/home/detail', extra: id);
+        GoRouter.of(context).push(
+          '${GoRouterState.of(context).matchedLocation}/detail',
+          extra: id,
+        );
       },
       child: Container(
         decoration: BoxDecoration(

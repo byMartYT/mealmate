@@ -13,7 +13,13 @@ class HeroItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       borderRadius: borderRadius,
-      onTap: () => {context.push('/home/detail', extra: recipe.id)},
+      onTap:
+          () => {
+            context.push(
+              '${GoRouterState.of(context).matchedLocation}/detail',
+              extra: recipe.id,
+            ),
+          },
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 6),
         child: Container(

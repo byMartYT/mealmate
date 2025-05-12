@@ -102,7 +102,7 @@ class _HeroCarouselState extends State<HeroCarousel> {
                   child: InkWell(
                     onTap: () {
                       context.push(
-                        '/home/detail',
+                        '${GoRouterState.of(context).matchedLocation}/detail',
                         extra: widget.recipes[_current].id,
                       );
                     },

@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mealmate_new/features/camera/ingredients_detection_provider.dart';
 
 // Provider für die ausgewählten Bilder (als Base64-Strings)
 final pickedImagesProvider =
@@ -173,20 +174,30 @@ class _CameraPageState extends ConsumerState<CameraPage> {
               IconButton(
                 icon: const Icon(Icons.check),
                 onPressed: () {
-                  // Bilder zum Provider hinzufügen und zurück navigieren
+                  // Bilder zum Provider hinzufügen
                   if (_base64Images.isNotEmpty) {
                     ref.read(pickedImagesProvider.notifier).clearImages();
                     ref
                         .read(pickedImagesProvider.notifier)
                         .addImages(_base64Images);
-                  }
 
-                  // Navigiere zurück (sicher mit try/catch)
-                  try {
-                    context.pop();
-                  } catch (e) {
-                    // Falls es keine vorherige Seite gibt, zur Home-Seite navigieren
-                    context.go('/home');
+                    // Starte die Zutatenerkennung und navigiere zur Ergebnisseite
+                    ref
+                        .read(ingredientsDetectionProvider.notifier)
+                        .detectIngredientsFromImages(_base64Images);
+
+                    // Navigiere zur Ergebnisseite
+                    context.go(
+                      '${GoRouterState.of(context).matchedLocation}/ingredients-result',
+                    );
+                  } else {
+                    // Zeige eine Fehlermeldung, wenn keine Bilder ausgewählt wurden
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Keine Bilder ausgewählt'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
                   }
                 },
                 tooltip: 'Done',

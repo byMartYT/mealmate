@@ -12,7 +12,7 @@ class BackendRepository {
     BaseOptions(
       baseUrl: 'http://localhost:8000',
       connectTimeout: const Duration(seconds: 5),
-      receiveTimeout: const Duration(seconds: 10),
+      receiveTimeout: const Duration(seconds: 30),
     ),
   );
 
@@ -174,12 +174,42 @@ class BackendRepository {
         data: {'images': base64Images},
       );
 
-      return (res.data['scans'] as List)
-          .map((json) => json as Map<String, dynamic>)
-          .toList();
+      if (res.data['success'] == true) {
+        // Extrahiere die erkannten Zutaten
+        return (res.data['ingredients'] as List)
+            .map(
+              (item) => {
+                'name': item['name'],
+                'amount': item['amount'],
+                'unit': item['unit'],
+              },
+            )
+            .toList();
+      } else {
+        print('Fehler bei der Zutatenerkennung: ${res.data['error']}');
+        return [];
+      }
     } catch (e) {
       print('Fehler beim Hochladen des Scans: $e');
       return [];
+    }
+  }
+
+  Future<List<String>> getRecipeRecommendations(
+    List<Map<String, dynamic>> ingredients,
+  ) async {
+    try {
+      print(ingredients);
+      final res = await _dio.post(
+        '/recipes/generate/list',
+        data: ingredients,
+      );
+
+      // Konvertiere das Ergebnis in eine Liste von Strings
+      return (res.data as List).cast<String>();
+    } catch (e) {
+      print('Error getting recipe recommendations: $e');
+      return ['Failed to get recommendations: ${e.toString()}'];
     }
   }
 }

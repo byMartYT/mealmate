@@ -10,8 +10,9 @@ from datetime import datetime
 from dotenv import load_dotenv
 from models import Recipe
 from image_models import ImageResponse, ImageUpload
-from ingredient_models import IngredientsResponse
-from llm_service import LLMService
+from ingredient_models import IngredientsResponse, IngredientItem
+import llm_service
+from llm_service import process_image_with_langchain
 
 # Lade die Umgebungsvariablen
 load_dotenv()
@@ -237,6 +238,23 @@ async def get_random_recipes(limit: int = 5):
     
     return recipes
 
+@app.post('/recipes/generate/list', response_model=List[str])
+async def generate_recipe_list(ingredients: List[IngredientItem]):
+    """
+    Generiert eine Liste von Rezepten basierend auf den angegebenen Zutaten.
+    
+    - ingredients: Liste von Zutaten
+    """
+
+    print(ingredients)
+    # Konvertiere die Zutaten in ein Format, das vom LLM-Service verarbeitet werden kann
+    ingredient_list = [ingredient.name for ingredient in ingredients]
+    
+    # Verwende den LLM-Service, um Rezepte zu generieren
+    recipes = llm_service.generate_recipes(ingredient_list)
+    
+    return recipes
+
 @app.get("/recipes/{recipe_id}", response_model=Recipe)
 async def get_recipe(recipe_id: str):
     """
@@ -389,44 +407,24 @@ async def search_recipes(
 @app.post("/detect-ingredients", response_model=IngredientsResponse)
 async def detect_ingredients(upload: ImageUpload):
     """
-    Analysiert Base64-codierte Bilder mit Azure OpenAI, um Lebensmittelzutaten zu erkennen.
+    Analyzes Base64-encoded images with Azure OpenAI to detect food ingredients.
     
-    - Prüft, ob mindestens ein Bild enthalten ist
-    - Analysiert die Bilder mit Azure OpenAI
-    - Gibt eine Liste der erkannten Zutaten zurück
+    - Checks if at least one image is provided
+    - Analyzes the images with Azure OpenAI
+    - Returns a list of detected ingredients
     """
-    # Überprüfe, ob Bilder gesendet wurden
+    # Check if images were sent
     if not upload.images or len(upload.images) == 0:
         return IngredientsResponse(
             success=False,
-            message="Keine Bilder gefunden",
-            error="Es wurde mindestens ein Bild erwartet"
+            message="No images found",
+            error="At least one image is required"
         )
     
     try:
-        # LLM-Service instanziieren
-        llm_service = LLMService()
         
-        # Speichere die Bilder zur späteren Verwendung (optional)
-        image_files = []
-        for i, base64_image in enumerate(upload.images):
-            # Generiere einen eindeutigen Dateinamen
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            filename = f"food_image_{timestamp}_{i}.jpg"
-            file_path = os.path.join(UPLOAD_DIR, filename)
-            
-            try:
-                # Dekodiere und speichere das Bild
-                with open(file_path, "wb") as f:
-                    f.write(base64.b64decode(base64_image))
-                image_files.append(file_path)
-            except Exception as e:
-                print(f"Fehler beim Speichern des Bildes: {e}")
-                # Fahre fort, auch wenn das Speichern fehlschlägt
-        
-        # Analysiere die Bilder mit Azure OpenAI
+        # Analysiere die Bilder mit Azure OpenAI über den LLM-Service
         ingredients_response = llm_service.analyze_images(upload.images)
-        
         return ingredients_response
         
     except Exception as e:
@@ -435,6 +433,8 @@ async def detect_ingredients(upload: ImageUpload):
             message="Fehler bei der Analyse der Bilder",
             error=str(e)
         )
+    
+
     
     
 if __name__ == "__main__":

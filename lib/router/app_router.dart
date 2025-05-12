@@ -6,7 +6,7 @@ import 'package:mealmate_new/features/shopping_list/shopping_page.dart';
 import '../features/home/home_page.dart';
 import '../features/search/search_page.dart';
 import '../features/camera/camera_page.dart';
-import '../features/camera/image_preview_page.dart';
+import '../features/camera/ingredients_result_page.dart';
 
 final _shellKey = GlobalKey<NavigatorState>();
 
@@ -14,14 +14,16 @@ class Routes {
   static const String home = '/home';
   static const String searchPath = '/search';
   static const String cameraPath = '/camera';
+  static const String ingredientsResultPath = '/ingredients-result';
   static const String favoritesPath = '/favorites';
   static const String listPath = '/list';
 }
 
 final router = GoRouter(
   navigatorKey: _shellKey,
-  initialLocation: '/home',
+  initialLocation: Routes.home,
   routes: [
+    // Hauptnavigation mit Tabs
     StatefulShellRoute.indexedStack(
       builder:
           (context, state, navigationShell) =>
@@ -64,6 +66,12 @@ final router = GoRouter(
             GoRoute(
               path: Routes.cameraPath,
               builder: (context, state) => CameraPage(),
+              routes: [
+                GoRoute(
+                  path: 'ingredients-result',
+                  builder: (context, state) => IngredientsResultPage(),
+                ),
+              ],
             ),
           ],
         ),
