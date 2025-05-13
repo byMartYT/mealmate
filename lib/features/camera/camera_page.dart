@@ -1,33 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mealmate_new/features/camera/ingredients_detection_provider.dart';
-
-// Provider für die ausgewählten Bilder (als Base64-Strings)
-final pickedImagesProvider =
-    StateNotifierProvider<PickedImagesNotifier, List<String>>((ref) {
-      return PickedImagesNotifier();
-    });
-
-class PickedImagesNotifier extends StateNotifier<List<String>> {
-  PickedImagesNotifier() : super([]);
-
-  // Ausgewählte Bilder hinzufügen
-  void addImages(List<String> base64Images) {
-    state = [...state, ...base64Images];
-  }
-
-  // Alle Bilder löschen
-  void clearImages() {
-    state = [];
-  }
-}
+import 'package:mealmate_new/features/camera/picked_images_provider.dart';
 
 class CameraPage extends ConsumerStatefulWidget {
   const CameraPage({super.key});
@@ -86,7 +65,7 @@ class _CameraPageState extends ConsumerState<CameraPage> {
         // Auf echten Geräten die Kamera öffnen
         final XFile? image = await picker.pickImage(
           source: ImageSource.camera,
-          imageQuality: 85, // Reduzierte Qualität für bessere Leistung
+          imageQuality: 75,
           maxWidth: 1200,
           maxHeight: 1200,
         );
@@ -106,7 +85,7 @@ class _CameraPageState extends ConsumerState<CameraPage> {
 
         // Bilder dem Provider hinzufügen
         if (_base64Images.isNotEmpty) {
-          ref.read(pickedImagesProvider.notifier).addImages(_base64Images);
+          ref.read(pickedImagesProvider.notifier).replaceImages(_base64Images);
 
           // Zeige Feedback an
           if (mounted) {
@@ -114,7 +93,7 @@ class _CameraPageState extends ConsumerState<CameraPage> {
               SnackBar(
                 content: Text('${_base64Images.length} pictures selected'),
                 backgroundColor: Colors.green,
-                duration: const Duration(seconds: 2),
+                duration: const Duration(seconds: 1),
               ),
             );
           }
@@ -148,7 +127,7 @@ class _CameraPageState extends ConsumerState<CameraPage> {
 
     for (var image in _pickedImages!) {
       try {
-        // Bild als Bytes lesen
+        // Bild einlesen
         final Uint8List bytes = await image.readAsBytes();
 
         // In Base64 konvertieren
@@ -167,7 +146,7 @@ class _CameraPageState extends ConsumerState<CameraPage> {
       canPop: false,
       child: Scaffold(
         appBar: AppBar(
-          title: Text(_isSimulator ? 'Galery' : 'Camera'),
+          title: Text(_isSimulator ? 'Gallery' : 'Camera'),
           actions: [
             // Nur anzeigen, wenn Bilder verfügbar sind
             if (_pickedImages != null && _pickedImages!.isNotEmpty)
@@ -176,10 +155,10 @@ class _CameraPageState extends ConsumerState<CameraPage> {
                 onPressed: () {
                   // Bilder zum Provider hinzufügen
                   if (_base64Images.isNotEmpty) {
-                    ref.read(pickedImagesProvider.notifier).clearImages();
+                    // Alle vorhandenen Bilder löschen und neue hinzufügen
                     ref
                         .read(pickedImagesProvider.notifier)
-                        .addImages(_base64Images);
+                        .replaceImages(_base64Images);
 
                     // Starte die Zutatenerkennung und navigiere zur Ergebnisseite
                     ref
@@ -305,18 +284,13 @@ class _CameraPageState extends ConsumerState<CameraPage> {
                               // Provider aktualisieren
                               ref
                                   .read(pickedImagesProvider.notifier)
-                                  .clearImages();
-                              if (_base64Images.isNotEmpty) {
-                                ref
-                                    .read(pickedImagesProvider.notifier)
-                                    .addImages(_base64Images);
-                              }
+                                  .replaceImages(_base64Images);
                             });
                           },
                           child: Container(
                             padding: const EdgeInsets.all(4),
                             decoration: BoxDecoration(
-                              color: Colors.red.withOpacity(0.9),
+                              color: Colors.red.withAlpha(230),
                               shape: BoxShape.circle,
                             ),
                             child: const Icon(

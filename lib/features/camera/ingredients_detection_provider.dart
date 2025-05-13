@@ -66,14 +66,12 @@ class IngredientsDetectionNotifier
         base64Images,
       );
 
-      print(ingredientsData);
-
       // Wenn keine Zutaten gefunden wurden
       if (ingredientsData.isEmpty) {
         state = state.copyWith(
           status: DetectionStatus.error,
           errorMessage:
-              'Keine Zutaten gefunden. Bitte versuche es mit einem klareren Bild.',
+              'No ingredients found. Please try with a clearer image.',
           isProcessing: false,
         );
         return;
@@ -95,7 +93,7 @@ class IngredientsDetectionNotifier
       // Fehlerbehandlung
       state = state.copyWith(
         status: DetectionStatus.error,
-        errorMessage: 'Fehler bei der Zutatenerkennung: ${e.toString()}',
+        errorMessage: 'Error detecting ingredients: ${e.toString()}',
         isProcessing: false,
       );
     }
@@ -142,9 +140,6 @@ class IngredientsDetectionNotifier
       // Zutaten in das richtige Format konvertieren
       final ingredientsData =
           state.ingredients.map((ing) => ing.toJson()).toList();
-
-      // Logger-Ausgabe für Debugging
-      print('Sending ingredients to backend: $ingredientsData');
 
       // API-Aufruf zum Backend
       final recommendations = await _backendRepo.getRecipeRecommendations(
