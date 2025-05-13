@@ -12,7 +12,7 @@ class HomeRecipeItem extends StatelessWidget {
     required this.image,
   });
 
-  factory HomeRecipeItem.fromMeal(RecipeSummary recipe) {
+  factory HomeRecipeItem.fromMeal(Recipe recipe) {
     return HomeRecipeItem(
       title: recipe.title,
       id: recipe.id,

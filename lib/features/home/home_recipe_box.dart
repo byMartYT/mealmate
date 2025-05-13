@@ -15,7 +15,7 @@ class RecipeBox extends StatelessWidget {
     required this.repeat,
   });
 
-  final List<RecipeSummary> recipes;
+  final List<Recipe> recipes;
   final String title;
   final int repeat;
 

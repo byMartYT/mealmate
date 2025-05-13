@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mealmate_new/features/camera/ingredients_detection_provider.dart';
 import 'package:mealmate_new/features/camera/recipe_detail_page.dart';
+import 'package:mealmate_new/features/widgets/error_screen.dart';
 import 'package:mealmate_new/features/widgets/loading_screen.dart';
 import 'package:mealmate_new/models/detected_ingredient.dart';
 
@@ -15,52 +16,19 @@ class IngredientsResultPage extends ConsumerWidget {
 
     // Zeige Ladebildschirm während der Verarbeitung
     if (detectionState.isProcessing) {
-      return Scaffold(
-        appBar: AppBar(title: const Text('Extracting Ingredients')),
-        body: const Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CircularProgressIndicator(),
-              SizedBox(height: 16),
-              Text('Analyzing image...'),
-              SizedBox(height: 8),
-              Text(
-                'The AI is searching for ingredients',
-                style: TextStyle(color: Colors.grey),
-              ),
-            ],
-          ),
-        ),
+      return LoadingScreen.ingredientExtraction(
+        withScaffold: true,
+        appBarTitle: 'Extracting Ingredients',
       );
     }
 
     // Zeige Fehlerbildschirm, falls ein Fehler aufgetreten ist
     if (detectionState.status == DetectionStatus.error) {
-      return Scaffold(
-        appBar: AppBar(title: const Text('Error')),
-        body: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.error_outline, color: Colors.red, size: 64),
-                const SizedBox(height: 16),
-                Text(
-                  detectionState.errorMessage ?? 'Unknown Error occured',
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 16),
-                ),
-                const SizedBox(height: 24),
-                ElevatedButton(
-                  onPressed: () => context.pop(),
-                  child: const Text('Back'),
-                ),
-              ],
-            ),
-          ),
-        ),
+      return ErrorScreen.goBack(
+        message: detectionState.errorMessage ?? 'Unknown Error occured',
+        withScaffold: true,
+        appBarTitle: 'Error',
+        onBack: () => context.pop(),
       );
     }
 

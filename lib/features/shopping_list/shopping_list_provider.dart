@@ -50,7 +50,7 @@ class ShoppingListNotifier extends StateNotifier<List<ShoppingListItem>> {
   }
 
   // Füge alle Zutaten eines Rezepts zur Einkaufsliste hinzu
-  Future<void> addRecipeIngredients(RecipeSummary recipe) async {
+  Future<void> addRecipeIngredients(Recipe recipe) async {
     final newItems =
         recipe.ingredients
             .map(

@@ -1,6 +1,6 @@
 import 'package:mealmate_new/models/ingredient.dart';
 
-class RecipeSummary {
+class Recipe {
   final String id;
   final String title;
   final String cookingTime;
@@ -12,7 +12,7 @@ class RecipeSummary {
   final List<String> instructions;
   final List<Ingredient> ingredients;
 
-  RecipeSummary({
+  Recipe({
     required this.id,
     required this.title,
     required this.cookingTime,
@@ -25,11 +25,11 @@ class RecipeSummary {
     required this.ingredients,
   });
 
-  factory RecipeSummary.fromJson(Map<String, dynamic> json) {
+  factory Recipe.fromJson(Map<String, dynamic> json) {
     // Konvertiere MongoDB ObjectId zu String, falls notwendig
     final id = json['_id'] ?? json['id'];
 
-    return RecipeSummary(
+    return Recipe(
       id: id.toString(),
       title: json['title'],
       ingredients:

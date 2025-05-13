@@ -4,12 +4,12 @@ import 'package:mealmate_new/features/home/hero_item.dart';
 import 'package:mealmate_new/models/recipe_summary.dart';
 
 const double kHeroHeight = 0.55;
-const double kItemHeight = 100;
+const double kItemHeight = 120;
 
 class HeroCarousel extends StatefulWidget {
   const HeroCarousel({super.key, required this.recipes});
 
-  final List<RecipeSummary> recipes;
+  final List<Recipe> recipes;
 
   @override
   State<HeroCarousel> createState() => _HeroCarouselState();

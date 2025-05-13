@@ -4,7 +4,9 @@ import 'package:mealmate_new/features/favorites/favorites_provider.dart';
 import 'package:mealmate_new/features/general/ingredients_list.dart';
 import 'package:mealmate_new/features/general/recipe_detail_controller.dart';
 import 'package:mealmate_new/features/widgets/add_ingredients_button.dart';
+import 'package:mealmate_new/features/widgets/error_screen.dart';
 import 'package:mealmate_new/features/widgets/instructions_list.dart';
+import 'package:mealmate_new/features/widgets/loading_screen.dart';
 import 'package:mealmate_new/features/widgets/meta_list.dart';
 import 'package:mealmate_new/features/widgets/tag_list.dart';
 import 'package:mealmate_new/models/recipe_summary.dart';
@@ -50,12 +52,18 @@ class RecipeDetailPage extends ConsumerWidget {
                     body: RecipeDetail(recipe),
                   )
                   : const Scaffold(
-                    body: Center(child: Text('Rezept nicht gefunden')),
+                    body: Center(child: Text('Recipe not found')),
                   ),
       loading:
           () =>
-              const Scaffold(body: Center(child: CircularProgressIndicator())),
-      error: (e, _) => Scaffold(body: Center(child: Text('Error: $e'))),
+              const Scaffold(body: LoadingScreen(message: 'Loading recipe...')),
+      error:
+          (e, _) => Scaffold(
+            body: ErrorScreen.general(
+              message: 'Error: $e',
+              withScaffold: false,
+            ),
+          ),
     );
   }
 }
@@ -63,7 +71,7 @@ class RecipeDetailPage extends ConsumerWidget {
 class RecipeDetail extends StatelessWidget {
   const RecipeDetail(this.recipe, {super.key});
 
-  final RecipeSummary recipe;
+  final Recipe recipe;
 
   @override
   Widget build(BuildContext context) {

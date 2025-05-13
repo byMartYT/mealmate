@@ -3,7 +3,7 @@ import 'package:mealmate_new/core/services/backend_service.dart';
 import 'package:mealmate_new/models/recipe_summary.dart';
 
 /// Provider für die Details eines Rezepts
-final recipeDetailProvider = FutureProvider.family<RecipeSummary?, String>((
+final recipeDetailProvider = FutureProvider.family<Recipe?, String>((
   ref,
   id,
 ) async {

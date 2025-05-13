@@ -207,16 +207,22 @@ async def get_highlighted_recipes():
     return recipes
 
 @app.get('/recipes/random', response_model=List[Recipe])
-async def get_random_recipes(limit: int = 5):
+async def get_random_recipes(limit: int = 5, category: Optional[str] = None):
     """
     Liefert eine zufällige Auswahl von Rezepten.
     
     - limit: Anzahl der zurückzugebenden Rezepte
+    - category: Optional, filtert Rezepte nach Kategorie
     """
     # Die MongoDB-Aggregationspipeline für zufällige Dokumente
-    pipeline = [
-        {"$sample": {"size": limit}}
-    ]
+    pipeline = []
+    
+    # Füge einen Match-Filter für die Kategorie hinzu, falls angegeben
+    if category:
+        pipeline.append({"$match": {"category": {"$regex": category, "$options": "i"}}})
+    
+    # Füge den Sample-Operator hinzu
+    pipeline.append({"$sample": {"size": limit}})
     
     recipes = await app.mongodb["recipes"].aggregate(pipeline).to_list(limit)
     

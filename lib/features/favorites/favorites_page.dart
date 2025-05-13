@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mealmate_new/features/favorites/favorites_provider.dart';
 import 'package:mealmate_new/features/search/search_item.dart';
+import 'package:mealmate_new/features/widgets/error_screen.dart';
+import 'package:mealmate_new/features/widgets/loading_screen.dart';
 import 'package:mealmate_new/main.dart';
 
 class FavoritesPage extends ConsumerWidget {
@@ -48,9 +50,10 @@ class FavoritesPage extends ConsumerWidget {
             itemBuilder: (context, index) => SearchItem(recipes[index]),
           );
         },
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const LoadingScreen(message: 'Loading favorites...'),
         error:
-            (error, stack) => Center(child: Text('Fehler beim Laden: $error')),
+            (error, stack) =>
+                ErrorScreen.general(message: 'Fehler beim Laden: $error'),
       ),
     );
   }

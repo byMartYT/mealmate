@@ -3,7 +3,7 @@ import 'package:mealmate_new/core/services/backend_service.dart';
 import 'package:mealmate_new/models/recipe_summary.dart';
 
 class SearchState {
-  final List<RecipeSummary> items;
+  final List<Recipe> items;
   final bool isLoading;
   final bool hasMore;
   final int page;
@@ -16,7 +16,7 @@ class SearchState {
   });
 
   SearchState copyWith({
-    List<RecipeSummary>? items,
+    List<Recipe>? items,
     bool? isLoading,
     bool? hasMore,
     int? page,

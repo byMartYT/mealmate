@@ -5,7 +5,7 @@ import 'package:mealmate_new/features/shopping_list/shopping_list_provider.dart'
 import 'package:mealmate_new/models/recipe_summary.dart';
 
 class AddIngredientsButton extends ConsumerWidget {
-  final RecipeSummary recipe;
+  final Recipe recipe;
 
   const AddIngredientsButton({super.key, required this.recipe});
 

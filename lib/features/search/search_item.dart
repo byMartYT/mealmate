@@ -5,7 +5,7 @@ import 'package:mealmate_new/models/recipe_summary.dart';
 class SearchItem extends StatelessWidget {
   const SearchItem(this.recipe, {super.key});
 
-  final RecipeSummary recipe;
+  final Recipe recipe;
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +50,7 @@ class SearchItem extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 11, // Etwas kleinere Schrift
-                color: Color.fromARGB(153, 0, 0, 0),
+                color: Theme.of(context).colorScheme.onPrimaryContainer,
                 height: 1.0, // Minimale Zeilenhöhe
               ),
             ),

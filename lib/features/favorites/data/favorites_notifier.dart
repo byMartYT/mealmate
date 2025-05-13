@@ -1,4 +1,3 @@
-// favourites_notifier.dart
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mealmate_new/theme/theme_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';

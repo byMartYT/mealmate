@@ -7,6 +7,8 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mealmate_new/features/camera/ingredients_detection_provider.dart';
 import 'package:mealmate_new/features/camera/picked_images_provider.dart';
+import 'package:mealmate_new/features/widgets/error_screen.dart';
+import 'package:mealmate_new/features/widgets/loading_screen.dart';
 
 class CameraPage extends ConsumerStatefulWidget {
   const CameraPage({super.key});
@@ -102,13 +104,11 @@ class _CameraPageState extends ConsumerState<CameraPage> {
     } catch (e) {
       debugPrint('Error while uploading: $e');
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
+        ErrorScreen.showErrorDialog(
+          context: context,
+          message:
               'Error while loading the images: ${e.toString().split('\n')[0]}',
-            ),
-            backgroundColor: Colors.red,
-          ),
+          actionButtonText: 'OK',
         );
       }
     } finally {
@@ -171,11 +171,10 @@ class _CameraPageState extends ConsumerState<CameraPage> {
                     );
                   } else {
                     // Zeige eine Fehlermeldung, wenn keine Bilder ausgewählt wurden
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Keine Bilder ausgewählt'),
-                        backgroundColor: Colors.red,
-                      ),
+                    ErrorScreen.showErrorDialog(
+                      context: context,
+                      message: 'Keine Bilder ausgewählt',
+                      actionButtonText: 'OK',
                     );
                   }
                 },
@@ -185,19 +184,7 @@ class _CameraPageState extends ConsumerState<CameraPage> {
         ),
         body:
             _isLoading
-                ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const CircularProgressIndicator(),
-                      const SizedBox(height: 16),
-                      Text(
-                        _isSimulator ? 'Choose images...' : 'Take picture...',
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                    ],
-                  ),
-                )
+                ? LoadingScreen.imageSelection(_isSimulator)
                 : _pickedImages == null || _pickedImages!.isEmpty
                 ? _buildEmptyState()
                 : _buildImagePreview(),

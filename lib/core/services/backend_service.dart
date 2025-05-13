@@ -17,7 +17,7 @@ class BackendRepository {
   );
 
   /// Sucht nach Rezepten mit den angegebenen Parametern
-  Future<List<RecipeSummary>> search(
+  Future<List<Recipe>> search(
     String q,
     int offset, {
     int limit = 20,
@@ -38,37 +38,36 @@ class BackendRepository {
       );
 
       // Direkte Liste von Rezepten zurückgeben
-      return (res.data as List)
-          .map((json) => RecipeSummary.fromJson(json))
-          .toList();
+      return (res.data as List).map((json) => Recipe.fromJson(json)).toList();
     } catch (e) {
       print('Fehler beim Abrufen der Suchergebnisse: $e');
       return [];
     }
   }
 
-  Future<List<RecipeSummary>> getHighlights() async {
+  Future<List<Recipe>> getHighlights() async {
     try {
       final res = await _dio.get('/recipes/highlights');
-      return (res.data as List)
-          .map((json) => RecipeSummary.fromJson(json))
-          .toList();
+      return (res.data as List).map((json) => Recipe.fromJson(json)).toList();
     } catch (e) {
       print('Fehler beim Abrufen der Highlights: $e');
       return [];
     }
   }
 
-  /// Holt eine zufällige Auswahl von Rezepten
-  Future<List<RecipeSummary>> getRandomRecipes({int limit = 5}) async {
+  Future<List<Recipe>> getRandomRecipes({
+    int limit = 5,
+    String? category,
+  }) async {
     try {
       final res = await _dio.get(
         '/recipes/random',
-        queryParameters: {'limit': limit},
+        queryParameters: {
+          'limit': limit,
+          if (category != null && category.isNotEmpty) 'category': category,
+        },
       );
-      return (res.data as List)
-          .map((json) => RecipeSummary.fromJson(json))
-          .toList();
+      return (res.data as List).map((json) => Recipe.fromJson(json)).toList();
     } catch (e) {
       print('Fehler beim Abrufen zufälliger Rezepte: $e');
       return [];
@@ -97,21 +96,21 @@ class BackendRepository {
 
       final recipes =
           (res.data['recipes'] as List)
-              .map((json) => RecipeSummary.fromJson(json))
+              .map((json) => Recipe.fromJson(json))
               .toList();
 
       return {'total': res.data['total'], 'recipes': recipes};
     } catch (e) {
       print('Fehler bei der erweiterten Suche: $e');
-      return {'total': 0, 'recipes': <RecipeSummary>[]};
+      return {'total': 0, 'recipes': <Recipe>[]};
     }
   }
 
   /// Holt ein einzelnes Rezept anhand seiner ID
-  Future<RecipeSummary?> getRecipeById(String id) async {
+  Future<Recipe?> getRecipeById(String id) async {
     try {
       final res = await _dio.get('/recipes/$id');
-      return RecipeSummary.fromJson(res.data);
+      return Recipe.fromJson(res.data);
     } catch (e) {
       print('Fehler beim Abrufen des Rezepts mit ID $id: $e');
       return null;

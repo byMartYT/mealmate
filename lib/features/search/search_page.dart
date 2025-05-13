@@ -3,21 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mealmate_new/core/services/backend_service.dart';
 import 'package:mealmate_new/features/search/search_item.dart';
+import 'package:mealmate_new/features/search/search_providers.dart';
+import 'package:mealmate_new/features/widgets/error_screen.dart';
+import 'package:mealmate_new/features/widgets/loading_screen.dart';
 import 'package:mealmate_new/main.dart';
 import 'search_controller.dart';
-
-// Provider für die zwischengespeicherten Kategorien
-final categoriesProvider = StateProvider<List<String>>((ref) => []);
-
-// Provider für das Laden der Kategorien
-final categoriesFutureProvider = FutureProvider<List<String>>((ref) async {
-  // Lade die Kategorien vom Backend
-  final repo = ref.watch(backendRepoProvider);
-  final categories = await repo.getCategories();
-  // Aktualisiere den State-Provider
-  ref.read(categoriesProvider.notifier).state = categories;
-  return categories;
-});
 
 class SearchPage extends ConsumerStatefulWidget {
   const SearchPage({super.key});
@@ -77,7 +67,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         showDialog(
           context: context,
           barrierDismissible: false,
-          builder: (_) => const Center(child: CircularProgressIndicator()),
+          builder: (_) => const LoadingScreen(message: 'Loading categories...'),
         );
 
         // Lade die Kategorien vom Backend
@@ -217,9 +207,12 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       ),
       body:
           state.isLoading && recipes.isEmpty
-              ? const Center(child: CircularProgressIndicator())
+              ? const LoadingScreen(message: 'Searching recipes...')
               : recipes.isEmpty
-              ? Center(child: Text('Keine Rezepte gefunden'))
+              ? ErrorScreen.general(
+                message: 'Keine Rezepte gefunden',
+                withScaffold: false,
+              )
               : GridView.builder(
                 padding: kPadding,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -237,7 +230,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                   // loading indicator at the bottom
                   return const Padding(
                     padding: EdgeInsets.symmetric(vertical: 16),
-                    child: Center(child: CircularProgressIndicator()),
+                    child: LoadingScreen(message: 'Loading more...'),
                   );
                 },
               ),

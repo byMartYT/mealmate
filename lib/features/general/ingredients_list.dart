@@ -22,7 +22,12 @@ class IngredientsList extends StatelessWidget {
                 Text(ingredient.name),
                 Text(
                   ingredient.measure,
-                  style: const TextStyle(color: Colors.black54),
+                  style: TextStyle(
+                    color:
+                        Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white60
+                            : Colors.black54,
+                  ),
                 ),
               ],
             ),

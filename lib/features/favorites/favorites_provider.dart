@@ -15,14 +15,12 @@ final favoritesProvider =
     });
 
 // Provider für vollständige Favoriten-Rezepte
-final favoritesRecipesProvider = FutureProvider<List<RecipeSummary>>((
-  ref,
-) async {
+final favoritesRecipesProvider = FutureProvider<List<Recipe>>((ref) async {
   final favoriteIds = ref.watch(favoritesProvider);
   if (favoriteIds.isEmpty) return [];
 
   final repo = ref.watch(backendRepoProvider);
-  final recipes = <RecipeSummary>[];
+  final recipes = <Recipe>[];
 
   for (final id in favoriteIds) {
     final recipe = await repo.getRecipeById(id);
