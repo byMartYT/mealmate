@@ -227,10 +227,10 @@ class _CameraPageState extends ConsumerState<CameraPage> {
                 ? null
                 : FloatingActionButton(
                   onPressed: () => _pickMedia(manualTrigger: true),
+                  tooltip: _isSimulator ? 'Choose images' : 'Take picture',
                   child: Icon(
                     _isSimulator ? Icons.photo_library : Icons.camera_alt,
                   ),
-                  tooltip: _isSimulator ? 'Choose images' : 'Take picture',
                 ),
       ),
     );

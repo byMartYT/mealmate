@@ -37,14 +37,14 @@ class AddIngredientsButton extends ConsumerWidget {
           // Füge alle Zutaten des Rezepts zur Einkaufsliste hinzu
           await ref
               .read(shoppingListProvider.notifier)
-              .addRecipeIngredients(recipe!);
+              .addRecipeIngredients(recipe);
 
           // Zeige Feedback
           if (!context.mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                '${recipe!.ingredients.length} ingredients added to shopping list',
+                '${recipe.ingredients.length} ingredients added to shopping list',
               ),
               duration: const Duration(seconds: 2),
               action: SnackBarAction(

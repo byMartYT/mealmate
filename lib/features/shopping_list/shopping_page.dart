@@ -87,53 +87,54 @@ class ShoppingPage extends ConsumerWidget {
                 elements: sortedItems,
                 groupBy: (item) => item.recipeName,
                 groupSeparatorBuilder:
-                    (recipeName) => Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Card(
-                        color: Theme.of(context).primaryColor.withAlpha(25),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              // Rezeptbild
-                              _buildRecipeImage(sortedItems, recipeName),
-                              // Rezeptname
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8.0,
-                                  ),
-                                  child: Text(
-                                    recipeName,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                    (recipeName) => Card(
+                      color: Theme.of(context).primaryColor,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            // Rezeptbild
+                            _buildRecipeImage(sortedItems, recipeName),
+                            // Rezeptname
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8.0,
+                                ),
+                                child: Text(
+                                  recipeName,
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.bodyLarge!.copyWith(
+                                    color:
+                                        Theme.of(context).colorScheme.onPrimary,
                                   ),
                                 ),
                               ),
-                              // Button zum Löschen aller Items eines Rezepts
-                              IconButton(
-                                icon: const Icon(
-                                  Icons.delete_outline,
-                                  size: 20,
-                                ),
-                                onPressed: () {
-                                  // Suche die recipeId anhand des ersten Items mit diesem Namen
-                                  final recipeId =
-                                      sortedItems
-                                          .firstWhere(
-                                            (item) =>
-                                                item.recipeName == recipeName,
-                                          )
-                                          .recipeId;
-                                  ref
-                                      .read(shoppingListProvider.notifier)
-                                      .removeRecipeItems(recipeId);
-                                },
+                            ),
+                            // Button zum Löschen aller Items eines Rezepts
+                            IconButton(
+                              icon: Icon(
+                                Icons.delete_outline,
+                                color: Theme.of(context).colorScheme.onPrimary,
+                                size: 24,
                               ),
-                            ],
-                          ),
+                              onPressed: () {
+                                // Suche die recipeId anhand des ersten Items mit diesem Namen
+                                final recipeId =
+                                    sortedItems
+                                        .firstWhere(
+                                          (item) =>
+                                              item.recipeName == recipeName,
+                                        )
+                                        .recipeId;
+                                ref
+                                    .read(shoppingListProvider.notifier)
+                                    .removeRecipeItems(recipeId);
+                              },
+                            ),
+                          ],
                         ),
                       ),
                     ),

@@ -29,7 +29,7 @@ class IngredientsDetectionState {
     return IngredientsDetectionState(
       ingredients: ingredients ?? this.ingredients,
       status: status ?? this.status,
-      errorMessage: errorMessage != null ? errorMessage : this.errorMessage,
+      errorMessage: errorMessage ?? this.errorMessage,
       isProcessing: isProcessing ?? this.isProcessing,
     );
   }
