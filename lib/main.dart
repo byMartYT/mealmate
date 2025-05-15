@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mealmate_new/features/search/search_page.dart';
 import 'package:mealmate_new/features/search/search_providers.dart';
 import 'package:mealmate_new/router/app_router.dart';
 import 'package:mealmate_new/theme/theme_controller.dart';

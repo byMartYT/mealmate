@@ -198,7 +198,6 @@ class BackendRepository {
     List<Map<String, dynamic>> ingredients,
   ) async {
     try {
-      print(ingredients);
       final res = await _dio.post('/recipes/generate/list', data: ingredients);
 
       // Konvertiere das Ergebnis in eine Liste von Strings

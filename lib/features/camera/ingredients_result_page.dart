@@ -156,11 +156,8 @@ class IngredientsResultPage extends ConsumerWidget {
               .read(ingredientsDetectionProvider.notifier)
               .getRecipeRecommendations();
 
-      print('Recommendations received: $recommendations');
-
       // Rezeptvorschläge anzeigen
       if (context.mounted) {
-        print('Showing recipe recommendations modal');
         _showRecipeRecommendations(context, recommendations);
       } else {
         print('Context not mounted when trying to show recommendations');

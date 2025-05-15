@@ -11,7 +11,7 @@ final recipeDetailProvider = FutureProvider.family<Recipe?, String>((
   try {
     return await repo.getRecipeById(id);
   } catch (e) {
-    print('Fehler beim Laden des Rezepts: $e');
+    print('Error while loading recipe: $e');
     return null;
   }
 });

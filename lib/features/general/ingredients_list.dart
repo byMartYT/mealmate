@@ -19,14 +19,21 @@ class IngredientsList extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(ingredient.name),
-                Text(
-                  ingredient.measure,
-                  style: TextStyle(
-                    color:
-                        Theme.of(context).brightness == Brightness.dark
-                            ? Colors.white60
-                            : Colors.black54,
+                Expanded(
+                  child: Text(ingredient.name, overflow: TextOverflow.ellipsis),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    ingredient.measure,
+                    textAlign: TextAlign.right,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color:
+                          Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white60
+                              : Colors.black54,
+                    ),
                   ),
                 ),
               ],

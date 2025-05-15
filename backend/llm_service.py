@@ -117,7 +117,7 @@ def analyze_images(base64_images: List[str]) -> IngredientsResponse:
                     amount=item.get("amount"),
                     unit=item.get("unit")
                 ))
-        print(ingredients)
+
         
         # Create the response
         if ingredients:
@@ -181,12 +181,10 @@ def generate_recipes(ingredients: List[str]) -> List[str]:
         # Invoke the LLM with the messages
         response = llm.invoke([system_message, human_message])
         content = response.content
-        
-        print(f"LLM response content: {content}")
+    
         
         # Prüfen, ob der Inhalt leer ist
         if not content or content.isspace():
-            print("Error: Received empty content from LLM")
             return ["No recipes found. Please try again with different ingredients."]
             
         # Bereinige den Inhalt von Markdown-Formatierungen
@@ -202,31 +200,26 @@ def generate_recipes(ingredients: List[str]) -> List[str]:
             if content.strip().endswith("```"):
                 content = content.strip()[:-3].strip()
                 
-        print(f"Cleaned recipe JSON content: {content}")
         
         try:
             # Parse the response as JSON
             recipe_list = json.loads(content)
-            print(f"Parsed recipe list: {recipe_list}")
             
             # Ensure the result is a list of strings
             if isinstance(recipe_list, list):
                 # Take up to 5 recipes
                 return recipe_list[:5]
             else:
-                print(f"Invalid response format (not a list): {recipe_list}")
                 return ["Unable to generate recipes. Please try with different ingredients."]
                 
         except json.JSONDecodeError as json_err:
             # If JSON parsing fails, attempt to extract a list from the text
-            print(f"JSON parsing error: {json_err}")
-            print(f"Attempting to extract recipe list from text: {content}")
+
             
             # Versuche, die Liste aus dem Text zu extrahieren
             import re
             recipe_matches = re.findall(r'"([^"]+)"', content)
             if recipe_matches:
-                print(f"Extracted recipe titles: {recipe_matches}")
                 return recipe_matches[:5]
             
             # If all else fails, return an error message
@@ -234,7 +227,6 @@ def generate_recipes(ingredients: List[str]) -> List[str]:
             
     except Exception as e:
         # In case of error, return a descriptive message
-        print(f"Error generating recipes: {str(e)}")
         return ["Unable to generate recipes. Please try again."]
 
 
@@ -294,12 +286,10 @@ def generate_recipe_details(recipe_title: str, ingredients: List[str]) -> Dict[s
         # Invoke the LLM with the messages
         response = llm.invoke([system_message, human_message])
         content = response.content
-        
-        print(f"Recipe details LLM response: {content[:500]}...") # Nur die ersten 500 Zeichen für bessere Lesbarkeit
+    
         
         # Prüfen, ob der Inhalt leer ist
         if not content or content.isspace():
-            print("Error: Received empty content from LLM when generating recipe details")
             return {
                 "title": recipe_title,
                 "error": "Empty response from AI service",
@@ -320,12 +310,10 @@ def generate_recipe_details(recipe_title: str, ingredients: List[str]) -> Dict[s
             if content.strip().endswith("```"):
                 content = content.strip()[:-3].strip()
                 
-        print(f"Cleaned JSON content: {content[:100]}...") # Die ersten 100 Zeichen der bereinigten Antwort
         
         try:
             # Parse the response as JSON
             recipe_details = json.loads(content)
-            print(f"Generated recipe details for: {recipe_title}")
             
             # Stellen Sie sicher, dass alle erforderlichen Felder vorhanden sind
             required_fields = ["title", "ingredients", "instructions"]
@@ -336,8 +324,6 @@ def generate_recipe_details(recipe_title: str, ingredients: List[str]) -> Dict[s
             return recipe_details
                 
         except json.JSONDecodeError as json_err:
-            # If JSON parsing fails, create a minimal recipe with the error
-            print(f"JSON parsing error in recipe details: {json_err}")
             
             # Versuche, zumindest die Anweisungen aus dem Text zu extrahieren
             instructions = []
@@ -359,7 +345,6 @@ def generate_recipe_details(recipe_title: str, ingredients: List[str]) -> Dict[s
     except Exception as e:
         # In case of error, return a descriptive error message
         error_msg = f"Error generating recipe details: {str(e)}"
-        print(error_msg)
         return {
             "title": recipe_title,
             "error": error_msg,

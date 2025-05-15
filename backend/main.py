@@ -248,7 +248,6 @@ async def generate_recipe_list(ingredients: List[IngredientItem]):
     - ingredients: Liste von Zutaten
     """
 
-    print(ingredients)
     # Konvertiere die Zutaten in ein Format, das vom LLM-Service verarbeitet werden kann
     ingredient_list = [ingredient.name for ingredient in ingredients]
     
