@@ -16,6 +16,11 @@ from llm_service import process_image_with_langchain
 
 # Lade die Umgebungsvariablen
 load_dotenv()
+# Versuche auch die öffentliche .env-Datei zu laden
+try:
+    load_dotenv(dotenv_path="../public.env")
+except Exception as e:
+    print(f"Warning: could not load public.env: {e}")
 
 app = FastAPI(
     title="MealMate API",
@@ -24,9 +29,10 @@ app = FastAPI(
 )
 
 # CORS-Einstellungen
+origins = os.getenv("CORS_ORIGINS", "*").split(",")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Im Produktivbetrieb spezifische Origins angeben
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

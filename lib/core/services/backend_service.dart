@@ -1,20 +1,23 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:mealmate_new/models/recipe_summary.dart';
 
 final backendRepoProvider = Provider((_) => BackendRepository());
 
-/// Repository für den Zugriff auf das eigene Backend
 class BackendRepository {
-  // Hier solltest du die URL deines Backends anpassen
-  // Für Emulatoren: Android = 10.0.2.2, iOS = localhost
-  final Dio _dio = Dio(
-    BaseOptions(
-      baseUrl: 'http://localhost:8000',
-      connectTimeout: const Duration(seconds: 5),
-      receiveTimeout: const Duration(seconds: 30),
-    ),
-  );
+  late final Dio _dio;
+
+  BackendRepository() {
+    final backendUrl = dotenv.env['BACKEND_URL'] ?? 'http://localhost:8000';
+    _dio = Dio(
+      BaseOptions(
+        baseUrl: backendUrl,
+        connectTimeout: const Duration(seconds: 5),
+        receiveTimeout: const Duration(seconds: 30),
+      ),
+    );
+  }
 
   /// Sucht nach Rezepten mit den angegebenen Parametern
   Future<List<Recipe>> search(
