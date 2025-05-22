@@ -25,7 +25,7 @@ class ShoppingPage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Einkaufsliste'),
+        title: const Text('Shopping List'),
         actions: [
           // Popup-Menü für Aktionen
           PopupMenuButton<String>(
@@ -42,7 +42,6 @@ class ShoppingPage extends ConsumerWidget {
                       .clearShoppingList();
                   break;
                 case 'sort_recipe':
-                  // Ist bereits implementiert durch GroupedListView
                   break;
               }
             },
@@ -50,11 +49,11 @@ class ShoppingPage extends ConsumerWidget {
                 (context) => [
                   const PopupMenuItem(
                     value: 'clear_checked',
-                    child: Text('Erledigte entfernen'),
+                    child: Text('Clear checked'),
                   ),
                   const PopupMenuItem(
                     value: 'clear_all',
-                    child: Text('Alle entfernen'),
+                    child: Text('Clear all'),
                   ),
                 ],
           ),

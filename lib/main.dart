@@ -12,7 +12,6 @@ const EdgeInsets kPadding = EdgeInsets.symmetric(horizontal: 16.0);
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Lade sowohl private als auch öffentliche Umgebungsvariablen
   await dotenv.load(fileName: 'public.env'); // Öffentliche Konfiguration
 
   final prefs = await SharedPreferences.getInstance();

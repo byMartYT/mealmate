@@ -49,9 +49,6 @@ class Recipe {
     );
   }
 
-  // Getter für die Bildgröße wird nicht mehr benötigt,
-  // da wir die vollständige URL vom Backend erhalten
-
   Map<String, dynamic> toJson() {
     return {
       'id': id,

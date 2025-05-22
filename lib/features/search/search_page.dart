@@ -60,10 +60,10 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     // Verwende die zwischengespeicherten Kategorien oder lade sie, wenn sie noch nicht geladen wurden
     List<String> categories = ref.read(categoriesProvider);
 
-    // Wenn die Kategorien noch nicht geladen wurden, lade sie jetzt
+    // Wenn die Kategorien noch nicht geladen wurden
     if (categories.isEmpty) {
       try {
-        // Zeige einen Ladeindikator nur wenn wir explizit Kategorien laden müssen
+        // Zeige einen Ladestatus nur wenn wir explizit Kategorien laden müssen
         showDialog(
           context: context,
           barrierDismissible: false,
@@ -73,13 +73,8 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         // Lade die Kategorien vom Backend
         categories = await ref.read(backendRepoProvider).getCategories();
         ref.read(categoriesProvider.notifier).state = categories;
-
-        // Schließe den Ladeindikator
+      } finally {
         if (context.mounted) Navigator.of(context).pop();
-      } catch (e) {
-        // Bei einem Fehler den Ladeindikator entfernen
-        if (context.mounted) Navigator.of(context).pop();
-        return; // Beende die Methode, da wir keine Kategorien haben
       }
     }
 
@@ -131,7 +126,6 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         _selectedCategory = category;
       });
 
-      // Aktualisiere Filter und lade neue Rezepte (ohne Controller-Invalidierung)
       final controller = ref.read(searchControllerProvider(_query).notifier);
       controller.changeFilter(category: category);
     }
@@ -166,7 +160,6 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                         ),
                         onDeleted: () {
                           setState(() => _selectedCategory = null);
-                          // Explizit den Controller mit null-Kategorie aktualisieren
                           final controller = ref.read(
                             searchControllerProvider(_query).notifier,
                           );
@@ -185,7 +178,6 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                 _query = value;
               });
 
-              // Controller aktualisieren ohne automatischen Fetch
               ref.invalidate(searchControllerProvider(value));
 
               // Explizit nur einen Fetch mit korrektem Filter ausführen

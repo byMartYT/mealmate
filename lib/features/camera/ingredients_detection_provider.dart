@@ -126,7 +126,6 @@ class IngredientsDetectionNotifier
     state = state.copyWith(ingredients: updatedIngredients);
   }
 
-  // Setzt den Zustand zurück
   void reset() {
     state = IngredientsDetectionState();
   }
@@ -134,7 +133,6 @@ class IngredientsDetectionNotifier
   // Sendet die Zutaten ans Backend und erhält Rezeptvorschläge
   Future<List<String>> getRecipeRecommendations() async {
     try {
-      // Status auf "laden" setzen
       state = state.copyWith(isProcessing: true);
 
       // Zutaten in das richtige Format konvertieren

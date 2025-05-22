@@ -18,40 +18,37 @@ class SearchItem extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Quadratisches Bild mit AspectRatio
           AspectRatio(
-            aspectRatio: 1.0, // Quadratisches Verhältnis
+            aspectRatio: 1.0,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: Image.network(recipe.image, fit: BoxFit.cover),
             ),
           ),
           SizedBox(height: 8), // Konsistenter Abstand
-          // Titel mit fester Höhe für 2 Zeilen
           SizedBox(
-            height: 38, // Leicht reduzierte Höhe für 2 Zeilen Text
+            height: 38,
             child: Text(
               recipe.title,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                 fontWeight: FontWeight.bold,
-                fontSize: 14, // Etwas kleinere Schrift
-                height: 1.2, // Kompaktere Zeilenhöhe
+                fontSize: 14,
+                height: 1.2,
               ),
             ),
           ),
-          // Kochzeit mit minimalem Abstand
           Padding(
-            padding: const EdgeInsets.only(top: 2), // Reduzierten Abstand
+            padding: const EdgeInsets.only(top: 2),
             child: Text(
               recipe.cookingTime,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                fontSize: 11, // Etwas kleinere Schrift
+                fontSize: 11,
                 color: Theme.of(context).colorScheme.onPrimaryContainer,
-                height: 1.0, // Minimale Zeilenhöhe
+                height: 1.0,
               ),
             ),
           ),

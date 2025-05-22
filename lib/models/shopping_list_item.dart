@@ -1,13 +1,12 @@
 import 'package:mealmate_new/models/ingredient.dart';
 
-/// Ein Element in der Einkaufsliste
 class ShoppingListItem {
-  final String id; // Eindeutige ID für das Item
-  final String recipeId; // ID des Rezepts, aus dem das Item stammt
-  final String recipeName; // Name des Rezepts für die Anzeige
-  final String recipeImage; // Bild-URL des Rezepts
-  final Ingredient ingredient; // Die eigentliche Zutat
-  bool isChecked; // Status (gekauft/nicht gekauft)
+  final String id;
+  final String recipeId;
+  final String recipeName;
+  final String recipeImage;
+  final Ingredient ingredient;
+  bool isChecked;
 
   ShoppingListItem({
     required this.id,
@@ -18,7 +17,6 @@ class ShoppingListItem {
     this.isChecked = false,
   });
 
-  // Kopiere mit Änderungen
   ShoppingListItem copyWith({
     String? id,
     String? recipeId,

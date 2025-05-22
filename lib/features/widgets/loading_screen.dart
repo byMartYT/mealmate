@@ -1,19 +1,10 @@
 import 'package:flutter/material.dart';
 
 class LoadingScreen extends StatelessWidget {
-  /// Title displayed in the loading screen
   final String title;
-
-  /// Primary message displayed below the loading indicator
   final String message;
-
-  /// Secondary message displayed as a subtitle (optional)
   final String? subtitle;
-
-  /// Whether to show the loading screen with a scaffold or just the content
   final bool withScaffold;
-
-  /// AppBar title (only used when withScaffold is true)
   final String? appBarTitle;
 
   const LoadingScreen({

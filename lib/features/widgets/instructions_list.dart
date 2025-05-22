@@ -12,14 +12,10 @@ class InstructionsList extends StatelessWidget {
       children: [
         Text('Instructions', style: Theme.of(context).textTheme.titleLarge),
         const SizedBox(height: 16),
-        // Jedes Element einzeln mit vertikalem Abstand
         ...instructions.asMap().entries.map(
           (entry) => Padding(
             padding: const EdgeInsets.only(bottom: 16),
-            child: InstructionItem(
-              text: entry.value,
-              index: entry.key + 1, // Sicherer als indexOf
-            ),
+            child: InstructionItem(text: entry.value, index: entry.key + 1),
           ),
         ),
       ],
@@ -40,7 +36,6 @@ class InstructionItem extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Nummer in einem Container
         Container(
           width: 80,
           margin: const EdgeInsets.only(bottom: 8),
@@ -60,7 +55,6 @@ class InstructionItem extends StatelessWidget {
           ),
         ),
 
-        // Text darunter mit vollem Platz
         Text(
           text,
           style: const TextStyle(fontSize: 16, color: Color(0xFF666666)),

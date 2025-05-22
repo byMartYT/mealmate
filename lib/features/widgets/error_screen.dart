@@ -1,22 +1,11 @@
 import 'package:flutter/material.dart';
 
 class ErrorScreen extends StatelessWidget {
-  /// Title displayed in the error screen
   final String title;
-
-  /// Primary error message displayed
   final String message;
-
-  /// Whether to show the error screen with a scaffold or just the content
   final bool withScaffold;
-
-  /// AppBar title (only used when withScaffold is true)
   final String? appBarTitle;
-
-  /// Action button text
   final String? actionButtonText;
-
-  /// Action button callback
   final VoidCallback? onActionPressed;
 
   const ErrorScreen({

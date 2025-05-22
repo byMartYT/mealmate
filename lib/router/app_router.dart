@@ -23,7 +23,6 @@ final router = GoRouter(
   navigatorKey: _shellKey,
   initialLocation: Routes.home,
   routes: [
-    // Hauptnavigation mit Tabs
     StatefulShellRoute.indexedStack(
       builder:
           (context, state, navigationShell) =>

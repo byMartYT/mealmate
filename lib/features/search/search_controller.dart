@@ -35,9 +35,7 @@ class SearchController extends StateNotifier<SearchState> {
   String? _category;
   String? _area;
 
-  SearchController(this._repo, this._query) : super(const SearchState()) {
-    // Kein automatischer Fetch im Konstruktor, wir rufen fetchNext() oder changeFilter() explizit auf
-  }
+  SearchController(this._repo, this._query) : super(const SearchState());
 
   Future<void> fetchNext() async {
     if (state.isLoading || !state.hasMore) return;
@@ -58,7 +56,6 @@ class SearchController extends StateNotifier<SearchState> {
     final nextPage = state.page + 1;
 
     try {
-      // Verwende die backend_service Methode
       final data = await _repo.search(
         _query,
         (nextPage - 1) * _pageSize,
