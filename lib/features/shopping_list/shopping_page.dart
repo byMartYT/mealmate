@@ -72,12 +72,12 @@ class ShoppingPage extends ConsumerWidget {
                     ),
                     SizedBox(height: 16),
                     Text(
-                      'Deine Einkaufsliste ist leer',
+                      'Your Shopping List is empty',
                       style: TextStyle(fontSize: 18, color: Colors.grey),
                     ),
                     SizedBox(height: 8),
                     Text(
-                      'Füge Zutaten aus Rezepten hinzu',
+                      'Add items to your list',
                       style: TextStyle(color: Colors.grey),
                     ),
                   ],

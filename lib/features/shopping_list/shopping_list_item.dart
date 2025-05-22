@@ -25,7 +25,9 @@ class ShoppingListItemTile extends ConsumerWidget {
       child: Card(
         elevation: 1.0,
         margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: CheckboxListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 12),
           value: item.isChecked,
           onChanged: (_) {
             ref.read(shoppingListProvider.notifier).toggleItemCheck(item.id);
@@ -53,11 +55,10 @@ class ShoppingListItemTile extends ConsumerWidget {
               Icons.restaurant,
               color:
                   item.isChecked
-                      ? Colors.grey
+                      ? Theme.of(context).colorScheme.secondary
                       : Theme.of(context).colorScheme.secondary,
             ),
           ),
-          tileColor: item.isChecked ? Colors.grey.shade100 : null,
         ),
       ),
     );

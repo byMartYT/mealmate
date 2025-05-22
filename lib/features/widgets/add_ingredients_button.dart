@@ -48,7 +48,7 @@ class AddIngredientsButton extends ConsumerWidget {
               ),
               duration: const Duration(seconds: 2),
               action: SnackBarAction(
-                label: 'Anzeigen',
+                label: 'Show',
                 onPressed: () {
                   // Navigiere zur Einkaufsliste mit GoRouter
                   GoRouter.of(context).go('/list');
