@@ -5,14 +5,11 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from bson import ObjectId
 from typing import List, Optional
 import os
-import base64
-from datetime import datetime
 from dotenv import load_dotenv
 from models import Recipe
-from image_models import ImageResponse, ImageUpload
+from image_models import ImageUpload
 from ingredient_models import IngredientsResponse, IngredientItem
 import llm_service
-from llm_service import process_image_with_langchain
 
 # Lade die Umgebungsvariablen
 load_dotenv()

@@ -83,7 +83,6 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       }
     }
 
-    // Jetzt haben wir garantiert Kategorien (oder die Methode wurde bereits beendet)
     if (!context.mounted) return;
 
     final category = await showModalBottomSheet<String>(

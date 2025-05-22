@@ -60,7 +60,7 @@ class AddIngredientsButton extends ConsumerWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.transparent,
           foregroundColor: Colors.white,
-          disabledBackgroundColor: Colors.grey.withOpacity(0.3),
+          disabledBackgroundColor: Colors.grey.withValues(alpha: 0.3),
           shadowColor: Colors.transparent,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),
