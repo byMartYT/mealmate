@@ -25,12 +25,12 @@ class FavoritesPage extends ConsumerWidget {
                   Icon(Icons.favorite_border, size: 64, color: Colors.grey),
                   SizedBox(height: 16),
                   Text(
-                    'Noch keine Favoriten',
+                    'No Favorites yet',
                     style: TextStyle(fontSize: 18, color: Colors.grey),
                   ),
                   SizedBox(height: 8),
                   Text(
-                    'Füge Rezepte zu deinen Favoriten hinzu',
+                    'Add some to your favorites',
                     style: TextStyle(color: Colors.grey),
                   ),
                 ],
