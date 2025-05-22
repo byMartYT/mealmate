@@ -17,7 +17,6 @@ MealMate ist eine moderne Flutter-App, die dir hilft, Rezepte basierend auf verf
 
 - [Flutter](https://flutter.dev/docs/get-started/install) (Version 3.0+)
 - [Docker](https://www.docker.com/products/docker-desktop/) und Docker Compose
-- [MongoDB](https://www.mongodb.com/) (wenn nicht über Docker genutzt)
 
 ### Backend einrichten
 
@@ -28,12 +27,10 @@ MealMate ist eine moderne Flutter-App, die dir hilft, Rezepte basierend auf verf
    cp example.env .env
    ```
 
-   Bei der erstmaligen Einrichtung sind die Standardwerte für MongoDB in den meisten Fällen ausreichend.
-
 2. **Backend mit Docker starten**:
 
    ```bash
-   docker-compose up -d
+   docker-compose up -d --build
    ```
 
    Dieser Befehl startet das Backend im Hintergrund. Das Backend ist dann unter http://localhost:8000 erreichbar.
@@ -101,7 +98,3 @@ Diese Datei enthält öffentliche Konfigurationen:
 - `BACKEND_URL`: URL zum Backend-Server
 - `PORT`: Port für den Backend-Server
 - `CORS_ORIGINS`: Erlaubte Origins für CORS
-
-## 📄 Lizenz
-
-© 2025
